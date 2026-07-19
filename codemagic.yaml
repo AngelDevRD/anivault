@@ -19,10 +19,10 @@ workflows:
         PACKAGE_NAME: "com.anivault.anivault"
         REPO: "negriuspro/anivault"
       flutter: stable
-      cache:
-        cache_paths:
-          - $HOME/.pub-cache
-          - $FLUTTER_ROOT/.pub-cache
+    cache:
+      cache_paths:
+        - $HOME/.pub-cache
+        - $FLUTTER_ROOT/.pub-cache
     scripts:
       - name: Instalar dependencias
         script: flutter pub get
@@ -90,10 +90,10 @@ workflows:
       flutter: stable
       xcode: latest
       cocoapods: default
-      cache:
-        cache_paths:
-          - $HOME/.pub-cache
-          - $HOME/Library/Caches/CocoaPods
+    cache:
+      cache_paths:
+        - $HOME/.pub-cache
+        - $HOME/Library/Caches/CocoaPods
     scripts:
       - name: Instalar dependencias
         script: flutter pub get
@@ -141,9 +141,9 @@ workflows:
       groups:
         - portfolio_release # RELEASE_GH_TOKEN, WEBHOOK_SECRET
       flutter: stable
-      cache:
-        cache_paths:
-          - $HOME/.pub-cache
+    cache:
+      cache_paths:
+        - $HOME/.pub-cache
     scripts:
       - name: Instalar dependencias
         script: flutter pub get
