@@ -1,0 +1,129 @@
+import 'package:isar_community/isar.dart';
+
+import 'package:anivault/features/library/domain/enums.dart';
+
+part 'media_entry.g.dart';
+
+/// Registro local de una obra (anime/manga/manhwa/manhua).
+///
+/// Contiene tanto los datos obtenidos de las APIs (AniList/Jikan) como el
+/// progreso personal del usuario. Es la única fuente de verdad local (Isar).
+@collection
+class MediaEntry {
+  Id id = Isar.autoIncrement;
+
+  /// Tipo de obra. Indexado para filtrar por pestaña de biblioteca.
+  @Index()
+  @enumerated
+  MediaType type;
+
+  /// Estado de seguimiento. Indexado para filtros y estadísticas.
+  @Index()
+  @enumerated
+  MediaStatus status;
+
+  // --- Identificadores externos ---
+  int? anilistId;
+  int? malId;
+
+  // --- Datos de la obra (desde API) ---
+  @Index(caseSensitive: false, type: IndexType.value)
+  String title;
+  String? titleOriginal;
+  String? titleEnglish;
+  String? coverImage;
+  String? bannerImage;
+  String? synopsis;
+  List<String> genres;
+  String? studio; // estudio (anime) o autor (manga)
+  String? publisher; // editorial
+  int? year;
+
+  /// Estado de emisión/publicación tal cual lo reporta la API
+  /// (RELEASING, FINISHED, NOT_YET_RELEASED, CANCELLED, HIATUS).
+  String? releaseStatus;
+  String? format; // TV, MOVIE, OVA, MANGA, ONE_SHOT, NOVEL...
+  String? countryOfOrigin; // JP, KR, CN...
+
+  int? totalEpisodes;
+  int? episodeDuration; // minutos por episodio
+  int? totalChapters;
+  int? totalVolumes;
+
+  /// Puntuación media externa (0-100 en AniList; se guarda tal cual).
+  int? averageScore;
+
+  // --- Progreso del usuario ---
+  int currentEpisode;
+  int currentChapter;
+  int currentVolume;
+  DateTime? startDate;
+  DateTime? lastUpdatedDate;
+  String? notes;
+
+  /// Calificación personal del usuario (0-10).
+  double? userRating;
+  bool favorite;
+
+  /// Fecha en que se agregó a la biblioteca.
+  DateTime addedDate = DateTime.now();
+
+  MediaEntry({
+    this.type = MediaType.anime,
+    this.status = MediaStatus.pending,
+    this.anilistId,
+    this.malId,
+    this.title = '',
+    this.titleOriginal,
+    this.titleEnglish,
+    this.coverImage,
+    this.bannerImage,
+    this.synopsis,
+    this.genres = const [],
+    this.studio,
+    this.publisher,
+    this.year,
+    this.releaseStatus,
+    this.format,
+    this.countryOfOrigin,
+    this.totalEpisodes,
+    this.episodeDuration,
+    this.totalChapters,
+    this.totalVolumes,
+    this.averageScore,
+    this.currentEpisode = 0,
+    this.currentChapter = 0,
+    this.currentVolume = 0,
+    this.startDate,
+    this.lastUpdatedDate,
+    this.notes,
+    this.userRating,
+    this.favorite = false,
+  });
+
+  /// Unidades totales según el tipo (episodios para anime, capítulos para lectura).
+  @ignore
+  int? get totalUnits =>
+      type == MediaType.anime ? totalEpisodes : totalChapters;
+
+  /// Unidades consumidas por el usuario según el tipo.
+  @ignore
+  int get currentUnits =>
+      type == MediaType.anime ? currentEpisode : currentChapter;
+
+  /// Progreso 0..1; 0 si no se conoce el total.
+  @ignore
+  double get progress {
+    final total = totalUnits;
+    if (total == null || total <= 0) return 0;
+    return (currentUnits / total).clamp(0.0, 1.0);
+  }
+
+  /// Minutos totales consumidos en este anime (0 para obras de lectura).
+  @ignore
+  int get minutesWatched {
+    if (type != MediaType.anime) return 0;
+    final dur = episodeDuration ?? 24; // duración estándar por defecto
+    return currentEpisode * dur;
+  }
+}
