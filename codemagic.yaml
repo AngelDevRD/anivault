@@ -17,7 +17,7 @@ workflows:
         - anivault_keystore # subir el keystore en Codemagic > Code signing identities
       vars:
         PACKAGE_NAME: "com.anivault.anivault"
-        REPO: "negriuspro/anivault"
+        REPO: "AngelDevRD/anivault"
       flutter: stable
     cache:
       cache_paths:
@@ -55,7 +55,7 @@ workflows:
             "https://uploads.github.com/repos/$REPO/releases/$RELEASE_ID/assets?name=anivault-android.aab"
           curl -sf $CURL_RETRY -X POST -H "Content-Type: application/json" \
             -d '{"workflowId":"android-workflow","buildStatus":"success"}' \
-            "https://portfolio-five-zeta-xf21p0a5se.vercel.app/api/orchestrator/webhook?owner=negriuspro&repo=anivault&secret=$WEBHOOK_SECRET"
+            "https://portfolio-five-zeta-xf21p0a5se.vercel.app/api/orchestrator/webhook?owner=AngelDevRD&repo=anivault&secret=$WEBHOOK_SECRET"
     artifacts:
       - build/app/outputs/flutter-apk/anivault-android.apk
       - build/app/outputs/bundle/release/anivault-android.aab
@@ -112,7 +112,7 @@ workflows:
         script: |
           curl -sf --retry 3 --retry-delay 5 --retry-connrefused --retry-all-errors -X POST -H "Content-Type: application/json" \
             -d '{"workflowId":"ios-workflow","buildStatus":"success"}' \
-            "https://portfolio-five-zeta-xf21p0a5se.vercel.app/api/orchestrator/webhook?owner=negriuspro&repo=anivault&secret=$WEBHOOK_SECRET"
+            "https://portfolio-five-zeta-xf21p0a5se.vercel.app/api/orchestrator/webhook?owner=AngelDevRD&repo=anivault&secret=$WEBHOOK_SECRET"
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
@@ -170,7 +170,7 @@ workflows:
             }
           }
 
-          $repo = "negriuspro/anivault"
+          $repo = "AngelDevRD/anivault"
           $tag = "v" + ((Get-Content pubspec.yaml | Select-String '^version:').ToString() -replace 'version:\s*', '' -replace '\+.*', '').Trim()
           $headers = @{ Authorization = "Bearer $env:RELEASE_GH_TOKEN" }
           try {
@@ -187,7 +187,7 @@ workflows:
               -Headers $uploadHeaders -ContentType "application/zip" -InFile "build/windows/anivault-windows.zip"
           }
           Invoke-WithRetry {
-            Invoke-RestMethod -Method Post -Uri "https://portfolio-five-zeta-xf21p0a5se.vercel.app/api/orchestrator/webhook?owner=negriuspro&repo=anivault&secret=$env:WEBHOOK_SECRET" `
+            Invoke-RestMethod -Method Post -Uri "https://portfolio-five-zeta-xf21p0a5se.vercel.app/api/orchestrator/webhook?owner=AngelDevRD&repo=anivault&secret=$env:WEBHOOK_SECRET" `
               -ContentType "application/json" -Body '{"workflowId":"windows-workflow","buildStatus":"success"}'
           }
     artifacts:
