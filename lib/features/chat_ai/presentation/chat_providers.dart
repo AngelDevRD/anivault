@@ -6,7 +6,7 @@ import 'package:anivault/features/chat_ai/domain/ai_context_builder.dart';
 import 'package:anivault/features/chat_ai/domain/chat_message.dart';
 import 'package:anivault/services/ai/ai_provider.dart';
 import 'package:anivault/services/ai/openrouter_provider.dart';
-import 'package:anivault/services/prefs_service.dart';
+import 'package:anivault/services/prefs_service.dart' as prefs_service show AiProvider;
 
 /// Instancia del proveedor de IA configurado en Ajustes. `null` si no hay
 /// clave configurada (Chat IA deshabilitado) o el proveedor no está
@@ -15,12 +15,12 @@ final aiProviderInstanceProvider = Provider<AiProvider?>((ref) {
   final prefs = ref.watch(prefsServiceProvider);
   if (!prefs.isAiConfigured) return null;
   return switch (prefs.aiProvider) {
-    AiProvider.openRouter => OpenRouterProvider(
+    prefs_service.AiProvider.openRouter => OpenRouterProvider(
       ref.watch(dioProvider),
       apiKey: prefs.apiKey,
       model: prefs.aiModel,
     ),
-    AiProvider.ollama => null,
+    prefs_service.AiProvider.ollama => null,
   };
 });
 

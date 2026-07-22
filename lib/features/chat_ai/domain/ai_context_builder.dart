@@ -31,7 +31,8 @@ class AiContextBuilder {
       ..writeln('## Resumen global');
     _writeSummary(buffer, stats);
 
-    buffer.writeln().writeln('## Biblioteca (${all.length} obras)');
+    buffer.writeln();
+    buffer.writeln('## Biblioteca (${all.length} obras)');
     final listed = all.take(_maxListedEntries);
     for (final e in listed) {
       buffer.writeln(_formatEntry(e));
