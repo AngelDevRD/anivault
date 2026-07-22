@@ -2,7 +2,7 @@ workflows:
   android-workflow:
     name: Android (APK + AAB)
     max_build_duration: 60
-    instance_type: linux_x2
+    instance_type: mac_mini_m2 # linux_x2 requiere plan de pago; mac_mini_m2 es la unica instancia gratuita
     triggering:
       events:
         - push
