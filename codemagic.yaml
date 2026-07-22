@@ -40,20 +40,30 @@ workflows:
         script: |
           CURL_RETRY="--retry 3 --retry-delay 5 --retry-connrefused --retry-all-errors --http1.1"
           TAG="v$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)"
-          RELEASE_ID=$(curl -s $CURL_RETRY -H "Authorization: Bearer $RELEASE_GH_TOKEN" \
-            "https://api.github.com/repos/$REPO/releases/tags/$TAG" | grep -o '"id": *[0-9]*' | head -1 | grep -o '[0-9]*')
+          echo "TAG=$TAG"
+          GET_RESP=$(curl -s -w "\nHTTP:%{http_code}" $CURL_RETRY -H "Authorization: Bearer $RELEASE_GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/releases/tags/$TAG")
+          echo "GET release/tags response: $GET_RESP"
+          RELEASE_ID=$(echo "$GET_RESP" | grep -o '"id": *[0-9]*' | head -1 | grep -o '[0-9]*')
           if [ -z "$RELEASE_ID" ]; then
-            RELEASE_ID=$(curl -s $CURL_RETRY -X POST -H "Authorization: Bearer $RELEASE_GH_TOKEN" -H "Content-Type: application/json" \
+            CREATE_RESP=$(curl -s -w "\nHTTP:%{http_code}" $CURL_RETRY -X POST -H "Authorization: Bearer $RELEASE_GH_TOKEN" -H "Content-Type: application/json" \
               -d "{\"tag_name\":\"$TAG\",\"generate_release_notes\":true}" \
-              "https://api.github.com/repos/$REPO/releases" | grep -o '"id": *[0-9]*' | head -1 | grep -o '[0-9]*')
+              "https://api.github.com/repos/$REPO/releases")
+            echo "POST release response: $CREATE_RESP"
+            RELEASE_ID=$(echo "$CREATE_RESP" | grep -o '"id": *[0-9]*' | head -1 | grep -o '[0-9]*')
           fi
-          curl -s $CURL_RETRY -X POST -H "Authorization: Bearer $RELEASE_GH_TOKEN" -H "Content-Type: application/vnd.android.package-archive" \
+          echo "RELEASE_ID=$RELEASE_ID"
+          if [ -z "$RELEASE_ID" ]; then
+            echo "ERROR: no se pudo obtener/crear el release, abortando antes de subir assets"
+            exit 1
+          fi
+          curl -s -w "\nHTTP:%{http_code}\n" $CURL_RETRY -X POST -H "Authorization: Bearer $RELEASE_GH_TOKEN" -H "Content-Type: application/vnd.android.package-archive" \
             --data-binary @build/app/outputs/flutter-apk/anivault-android.apk \
             "https://uploads.github.com/repos/$REPO/releases/$RELEASE_ID/assets?name=anivault-android.apk"
-          curl -s $CURL_RETRY -X POST -H "Authorization: Bearer $RELEASE_GH_TOKEN" -H "Content-Type: application/octet-stream" \
+          curl -s -w "\nHTTP:%{http_code}\n" $CURL_RETRY -X POST -H "Authorization: Bearer $RELEASE_GH_TOKEN" -H "Content-Type: application/octet-stream" \
             --data-binary @build/app/outputs/bundle/release/anivault-android.aab \
             "https://uploads.github.com/repos/$REPO/releases/$RELEASE_ID/assets?name=anivault-android.aab"
-          curl -sf $CURL_RETRY -X POST -H "Content-Type: application/json" \
+          curl -s -w "\nHTTP:%{http_code}\n" $CURL_RETRY -X POST -H "Content-Type: application/json" \
             -d '{"workflowId":"android-workflow","buildStatus":"success"}' \
             "https://portfolio-five-zeta-xf21p0a5se.vercel.app/api/orchestrator/webhook?owner=AngelDevRD&repo=anivault&secret=$WEBHOOK_SECRET"
     artifacts:
