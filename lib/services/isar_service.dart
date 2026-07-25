@@ -2,6 +2,7 @@ import 'package:isar_community/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:anivault/features/library/data/models/media_entry.dart';
+import 'package:anivault/features/library/data/models/sync_deletion.dart';
 import 'package:anivault/features/library/domain/enums.dart';
 
 /// Acceso a la base de datos local Isar. Fuente única de verdad offline.
@@ -14,7 +15,7 @@ class IsarService {
   static Future<IsarService> open() async {
     final dir = await getApplicationDocumentsDirectory();
     final isar = await Isar.open(
-      [MediaEntrySchema],
+      [MediaEntrySchema, SyncDeletionSchema],
       directory: dir.path,
       name: 'anivault',
     );
@@ -25,11 +26,18 @@ class IsarService {
 
   Future<int> upsert(MediaEntry entry) {
     entry.lastUpdatedDate = DateTime.now();
+    entry.dirty = true;
     return isar.writeTxn(() => isar.mediaEntrys.put(entry));
   }
 
   Future<bool> delete(int id) {
-    return isar.writeTxn(() => isar.mediaEntrys.delete(id));
+    return isar.writeTxn(() async {
+      final entry = await isar.mediaEntrys.get(id);
+      if (entry != null) {
+        await isar.syncDeletions.put(SyncDeletion()..uuid = entry.uuid);
+      }
+      return isar.mediaEntrys.delete(id);
+    });
   }
 
   // --- Lectura ---

@@ -62,90 +62,92 @@ const MediaEntrySchema = CollectionSchema(
       name: r'currentVolume',
       type: IsarType.long,
     ),
+    r'dirty': PropertySchema(id: 9, name: r'dirty', type: IsarType.bool),
     r'episodeDuration': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'episodeDuration',
       type: IsarType.long,
     ),
-    r'favorite': PropertySchema(id: 10, name: r'favorite', type: IsarType.bool),
-    r'format': PropertySchema(id: 11, name: r'format', type: IsarType.string),
+    r'favorite': PropertySchema(id: 11, name: r'favorite', type: IsarType.bool),
+    r'format': PropertySchema(id: 12, name: r'format', type: IsarType.string),
     r'genres': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'genres',
       type: IsarType.stringList,
     ),
     r'lastUpdatedDate': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'lastUpdatedDate',
       type: IsarType.dateTime,
     ),
-    r'malId': PropertySchema(id: 14, name: r'malId', type: IsarType.long),
-    r'notes': PropertySchema(id: 15, name: r'notes', type: IsarType.string),
+    r'malId': PropertySchema(id: 15, name: r'malId', type: IsarType.long),
+    r'notes': PropertySchema(id: 16, name: r'notes', type: IsarType.string),
     r'publisher': PropertySchema(
-      id: 16,
+      id: 17,
       name: r'publisher',
       type: IsarType.string,
     ),
     r'releaseStatus': PropertySchema(
-      id: 17,
+      id: 18,
       name: r'releaseStatus',
       type: IsarType.string,
     ),
     r'startDate': PropertySchema(
-      id: 18,
+      id: 19,
       name: r'startDate',
       type: IsarType.dateTime,
     ),
     r'status': PropertySchema(
-      id: 19,
+      id: 20,
       name: r'status',
       type: IsarType.byte,
       enumMap: _MediaEntrystatusEnumValueMap,
     ),
-    r'studio': PropertySchema(id: 20, name: r'studio', type: IsarType.string),
+    r'studio': PropertySchema(id: 21, name: r'studio', type: IsarType.string),
     r'synopsis': PropertySchema(
-      id: 21,
+      id: 22,
       name: r'synopsis',
       type: IsarType.string,
     ),
-    r'title': PropertySchema(id: 22, name: r'title', type: IsarType.string),
+    r'title': PropertySchema(id: 23, name: r'title', type: IsarType.string),
     r'titleEnglish': PropertySchema(
-      id: 23,
+      id: 24,
       name: r'titleEnglish',
       type: IsarType.string,
     ),
     r'titleOriginal': PropertySchema(
-      id: 24,
+      id: 25,
       name: r'titleOriginal',
       type: IsarType.string,
     ),
     r'totalChapters': PropertySchema(
-      id: 25,
+      id: 26,
       name: r'totalChapters',
       type: IsarType.long,
     ),
     r'totalEpisodes': PropertySchema(
-      id: 26,
+      id: 27,
       name: r'totalEpisodes',
       type: IsarType.long,
     ),
     r'totalVolumes': PropertySchema(
-      id: 27,
+      id: 28,
       name: r'totalVolumes',
       type: IsarType.long,
     ),
     r'type': PropertySchema(
-      id: 28,
+      id: 29,
       name: r'type',
       type: IsarType.byte,
       enumMap: _MediaEntrytypeEnumValueMap,
     ),
     r'userRating': PropertySchema(
-      id: 29,
+      id: 30,
       name: r'userRating',
       type: IsarType.double,
     ),
-    r'year': PropertySchema(id: 30, name: r'year', type: IsarType.long),
+    r'uuid': PropertySchema(id: 31, name: r'uuid', type: IsarType.string),
+    r'year': PropertySchema(id: 32, name: r'year', type: IsarType.long),
   },
 
   estimateSize: _mediaEntryEstimateSize,
@@ -190,6 +192,19 @@ const MediaEntrySchema = CollectionSchema(
           name: r'title',
           type: IndexType.value,
           caseSensitive: false,
+        ),
+      ],
+    ),
+    r'uuid': IndexSchema(
+      id: 2134397340427724972,
+      name: r'uuid',
+      unique: true,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'uuid',
+          type: IndexType.hash,
+          caseSensitive: true,
         ),
       ],
     ),
@@ -283,6 +298,7 @@ int _mediaEntryEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
+  bytesCount += 3 + object.uuid.length * 3;
   return bytesCount;
 }
 
@@ -301,28 +317,30 @@ void _mediaEntrySerialize(
   writer.writeLong(offsets[6], object.currentChapter);
   writer.writeLong(offsets[7], object.currentEpisode);
   writer.writeLong(offsets[8], object.currentVolume);
-  writer.writeLong(offsets[9], object.episodeDuration);
-  writer.writeBool(offsets[10], object.favorite);
-  writer.writeString(offsets[11], object.format);
-  writer.writeStringList(offsets[12], object.genres);
-  writer.writeDateTime(offsets[13], object.lastUpdatedDate);
-  writer.writeLong(offsets[14], object.malId);
-  writer.writeString(offsets[15], object.notes);
-  writer.writeString(offsets[16], object.publisher);
-  writer.writeString(offsets[17], object.releaseStatus);
-  writer.writeDateTime(offsets[18], object.startDate);
-  writer.writeByte(offsets[19], object.status.index);
-  writer.writeString(offsets[20], object.studio);
-  writer.writeString(offsets[21], object.synopsis);
-  writer.writeString(offsets[22], object.title);
-  writer.writeString(offsets[23], object.titleEnglish);
-  writer.writeString(offsets[24], object.titleOriginal);
-  writer.writeLong(offsets[25], object.totalChapters);
-  writer.writeLong(offsets[26], object.totalEpisodes);
-  writer.writeLong(offsets[27], object.totalVolumes);
-  writer.writeByte(offsets[28], object.type.index);
-  writer.writeDouble(offsets[29], object.userRating);
-  writer.writeLong(offsets[30], object.year);
+  writer.writeBool(offsets[9], object.dirty);
+  writer.writeLong(offsets[10], object.episodeDuration);
+  writer.writeBool(offsets[11], object.favorite);
+  writer.writeString(offsets[12], object.format);
+  writer.writeStringList(offsets[13], object.genres);
+  writer.writeDateTime(offsets[14], object.lastUpdatedDate);
+  writer.writeLong(offsets[15], object.malId);
+  writer.writeString(offsets[16], object.notes);
+  writer.writeString(offsets[17], object.publisher);
+  writer.writeString(offsets[18], object.releaseStatus);
+  writer.writeDateTime(offsets[19], object.startDate);
+  writer.writeByte(offsets[20], object.status.index);
+  writer.writeString(offsets[21], object.studio);
+  writer.writeString(offsets[22], object.synopsis);
+  writer.writeString(offsets[23], object.title);
+  writer.writeString(offsets[24], object.titleEnglish);
+  writer.writeString(offsets[25], object.titleOriginal);
+  writer.writeLong(offsets[26], object.totalChapters);
+  writer.writeLong(offsets[27], object.totalEpisodes);
+  writer.writeLong(offsets[28], object.totalVolumes);
+  writer.writeByte(offsets[29], object.type.index);
+  writer.writeDouble(offsets[30], object.userRating);
+  writer.writeString(offsets[31], object.uuid);
+  writer.writeLong(offsets[32], object.year);
 }
 
 MediaEntry _mediaEntryDeserialize(
@@ -340,35 +358,37 @@ MediaEntry _mediaEntryDeserialize(
     currentChapter: reader.readLongOrNull(offsets[6]) ?? 0,
     currentEpisode: reader.readLongOrNull(offsets[7]) ?? 0,
     currentVolume: reader.readLongOrNull(offsets[8]) ?? 0,
-    episodeDuration: reader.readLongOrNull(offsets[9]),
-    favorite: reader.readBoolOrNull(offsets[10]) ?? false,
-    format: reader.readStringOrNull(offsets[11]),
-    genres: reader.readStringList(offsets[12]) ?? const [],
-    lastUpdatedDate: reader.readDateTimeOrNull(offsets[13]),
-    malId: reader.readLongOrNull(offsets[14]),
-    notes: reader.readStringOrNull(offsets[15]),
-    publisher: reader.readStringOrNull(offsets[16]),
-    releaseStatus: reader.readStringOrNull(offsets[17]),
-    startDate: reader.readDateTimeOrNull(offsets[18]),
+    episodeDuration: reader.readLongOrNull(offsets[10]),
+    favorite: reader.readBoolOrNull(offsets[11]) ?? false,
+    format: reader.readStringOrNull(offsets[12]),
+    genres: reader.readStringList(offsets[13]) ?? const [],
+    lastUpdatedDate: reader.readDateTimeOrNull(offsets[14]),
+    malId: reader.readLongOrNull(offsets[15]),
+    notes: reader.readStringOrNull(offsets[16]),
+    publisher: reader.readStringOrNull(offsets[17]),
+    releaseStatus: reader.readStringOrNull(offsets[18]),
+    startDate: reader.readDateTimeOrNull(offsets[19]),
     status:
-        _MediaEntrystatusValueEnumMap[reader.readByteOrNull(offsets[19])] ??
+        _MediaEntrystatusValueEnumMap[reader.readByteOrNull(offsets[20])] ??
         MediaStatus.pending,
-    studio: reader.readStringOrNull(offsets[20]),
-    synopsis: reader.readStringOrNull(offsets[21]),
-    title: reader.readStringOrNull(offsets[22]) ?? '',
-    titleEnglish: reader.readStringOrNull(offsets[23]),
-    titleOriginal: reader.readStringOrNull(offsets[24]),
-    totalChapters: reader.readLongOrNull(offsets[25]),
-    totalEpisodes: reader.readLongOrNull(offsets[26]),
-    totalVolumes: reader.readLongOrNull(offsets[27]),
+    studio: reader.readStringOrNull(offsets[21]),
+    synopsis: reader.readStringOrNull(offsets[22]),
+    title: reader.readStringOrNull(offsets[23]) ?? '',
+    titleEnglish: reader.readStringOrNull(offsets[24]),
+    titleOriginal: reader.readStringOrNull(offsets[25]),
+    totalChapters: reader.readLongOrNull(offsets[26]),
+    totalEpisodes: reader.readLongOrNull(offsets[27]),
+    totalVolumes: reader.readLongOrNull(offsets[28]),
     type:
-        _MediaEntrytypeValueEnumMap[reader.readByteOrNull(offsets[28])] ??
+        _MediaEntrytypeValueEnumMap[reader.readByteOrNull(offsets[29])] ??
         MediaType.anime,
-    userRating: reader.readDoubleOrNull(offsets[29]),
-    year: reader.readLongOrNull(offsets[30]),
+    userRating: reader.readDoubleOrNull(offsets[30]),
+    year: reader.readLongOrNull(offsets[32]),
   );
   object.addedDate = reader.readDateTime(offsets[0]);
+  object.dirty = reader.readBool(offsets[9]);
   object.id = id;
+  object.uuid = reader.readString(offsets[31]);
   return object;
 }
 
@@ -398,52 +418,56 @@ P _mediaEntryDeserializeProp<P>(
     case 8:
       return (reader.readLongOrNull(offset) ?? 0) as P;
     case 9:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 10:
-      return (reader.readBoolOrNull(offset) ?? false) as P;
-    case 11:
-      return (reader.readStringOrNull(offset)) as P;
-    case 12:
-      return (reader.readStringList(offset) ?? const []) as P;
-    case 13:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 14:
       return (reader.readLongOrNull(offset)) as P;
-    case 15:
+    case 11:
+      return (reader.readBoolOrNull(offset) ?? false) as P;
+    case 12:
       return (reader.readStringOrNull(offset)) as P;
+    case 13:
+      return (reader.readStringList(offset) ?? const []) as P;
+    case 14:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 15:
+      return (reader.readLongOrNull(offset)) as P;
     case 16:
       return (reader.readStringOrNull(offset)) as P;
     case 17:
       return (reader.readStringOrNull(offset)) as P;
     case 18:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 19:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 20:
       return (_MediaEntrystatusValueEnumMap[reader.readByteOrNull(offset)] ??
               MediaStatus.pending)
           as P;
-    case 20:
-      return (reader.readStringOrNull(offset)) as P;
     case 21:
       return (reader.readStringOrNull(offset)) as P;
     case 22:
-      return (reader.readStringOrNull(offset) ?? '') as P;
-    case 23:
       return (reader.readStringOrNull(offset)) as P;
+    case 23:
+      return (reader.readStringOrNull(offset) ?? '') as P;
     case 24:
       return (reader.readStringOrNull(offset)) as P;
     case 25:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 26:
       return (reader.readLongOrNull(offset)) as P;
     case 27:
       return (reader.readLongOrNull(offset)) as P;
     case 28:
+      return (reader.readLongOrNull(offset)) as P;
+    case 29:
       return (_MediaEntrytypeValueEnumMap[reader.readByteOrNull(offset)] ??
               MediaType.anime)
           as P;
-    case 29:
-      return (reader.readDoubleOrNull(offset)) as P;
     case 30:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 31:
+      return (reader.readString(offset)) as P;
+    case 32:
       return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -487,6 +511,60 @@ List<IsarLinkBase<dynamic>> _mediaEntryGetLinks(MediaEntry object) {
 
 void _mediaEntryAttach(IsarCollection<dynamic> col, Id id, MediaEntry object) {
   object.id = id;
+}
+
+extension MediaEntryByIndex on IsarCollection<MediaEntry> {
+  Future<MediaEntry?> getByUuid(String uuid) {
+    return getByIndex(r'uuid', [uuid]);
+  }
+
+  MediaEntry? getByUuidSync(String uuid) {
+    return getByIndexSync(r'uuid', [uuid]);
+  }
+
+  Future<bool> deleteByUuid(String uuid) {
+    return deleteByIndex(r'uuid', [uuid]);
+  }
+
+  bool deleteByUuidSync(String uuid) {
+    return deleteByIndexSync(r'uuid', [uuid]);
+  }
+
+  Future<List<MediaEntry?>> getAllByUuid(List<String> uuidValues) {
+    final values = uuidValues.map((e) => [e]).toList();
+    return getAllByIndex(r'uuid', values);
+  }
+
+  List<MediaEntry?> getAllByUuidSync(List<String> uuidValues) {
+    final values = uuidValues.map((e) => [e]).toList();
+    return getAllByIndexSync(r'uuid', values);
+  }
+
+  Future<int> deleteAllByUuid(List<String> uuidValues) {
+    final values = uuidValues.map((e) => [e]).toList();
+    return deleteAllByIndex(r'uuid', values);
+  }
+
+  int deleteAllByUuidSync(List<String> uuidValues) {
+    final values = uuidValues.map((e) => [e]).toList();
+    return deleteAllByIndexSync(r'uuid', values);
+  }
+
+  Future<Id> putByUuid(MediaEntry object) {
+    return putByIndex(r'uuid', object);
+  }
+
+  Id putByUuidSync(MediaEntry object, {bool saveLinks = true}) {
+    return putByIndexSync(r'uuid', object, saveLinks: saveLinks);
+  }
+
+  Future<List<Id>> putAllByUuid(List<MediaEntry> objects) {
+    return putAllByIndex(r'uuid', objects);
+  }
+
+  List<Id> putAllByUuidSync(List<MediaEntry> objects, {bool saveLinks = true}) {
+    return putAllByIndexSync(r'uuid', objects, saveLinks: saveLinks);
+  }
 }
 
 extension MediaEntryQueryWhereSort
@@ -946,6 +1024,60 @@ extension MediaEntryQueryWhere
             )
             .addWhereClause(
               IndexWhereClause.lessThan(indexName: r'title', upper: ['']),
+            );
+      }
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterWhereClause> uuidEqualTo(
+    String uuid,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        IndexWhereClause.equalTo(indexName: r'uuid', value: [uuid]),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterWhereClause> uuidNotEqualTo(
+    String uuid,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'uuid',
+                lower: [],
+                upper: [uuid],
+                includeUpper: false,
+              ),
+            )
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'uuid',
+                lower: [uuid],
+                includeLower: false,
+                upper: [],
+              ),
+            );
+      } else {
+        return query
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'uuid',
+                lower: [uuid],
+                includeLower: false,
+                upper: [],
+              ),
+            )
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'uuid',
+                lower: [],
+                upper: [uuid],
+                includeUpper: false,
+              ),
             );
       }
     });
@@ -1800,6 +1932,16 @@ extension MediaEntryQueryFilter
           upper: upper,
           includeUpper: includeUpper,
         ),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition> dirtyEqualTo(
+    bool value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'dirty', value: value),
       );
     });
   }
@@ -4237,6 +4379,152 @@ extension MediaEntryQueryFilter
     });
   }
 
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition> uuidEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'uuid',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition> uuidGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'uuid',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition> uuidLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'uuid',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition> uuidBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'uuid',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition> uuidStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'uuid',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition> uuidEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'uuid',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition> uuidContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'uuid',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition> uuidMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'uuid',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition> uuidIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'uuid', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition> uuidIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'uuid', value: ''),
+      );
+    });
+  }
+
   QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition> yearIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -4429,6 +4717,18 @@ extension MediaEntryQuerySortBy
   QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> sortByCurrentVolumeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'currentVolume', Sort.desc);
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> sortByDirty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'dirty', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> sortByDirtyDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'dirty', Sort.desc);
     });
   }
 
@@ -4674,6 +4974,18 @@ extension MediaEntryQuerySortBy
     });
   }
 
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> sortByUuid() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'uuid', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> sortByUuidDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'uuid', Sort.desc);
+    });
+  }
+
   QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> sortByYear() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'year', Sort.asc);
@@ -4797,6 +5109,18 @@ extension MediaEntryQuerySortThenBy
   QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> thenByCurrentVolumeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'currentVolume', Sort.desc);
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> thenByDirty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'dirty', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> thenByDirtyDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'dirty', Sort.desc);
     });
   }
 
@@ -5054,6 +5378,18 @@ extension MediaEntryQuerySortThenBy
     });
   }
 
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> thenByUuid() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'uuid', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> thenByUuidDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'uuid', Sort.desc);
+    });
+  }
+
   QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> thenByYear() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'year', Sort.asc);
@@ -5129,6 +5465,12 @@ extension MediaEntryQueryWhereDistinct
   QueryBuilder<MediaEntry, MediaEntry, QDistinct> distinctByCurrentVolume() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'currentVolume');
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QDistinct> distinctByDirty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'dirty');
     });
   }
 
@@ -5282,6 +5624,14 @@ extension MediaEntryQueryWhereDistinct
     });
   }
 
+  QueryBuilder<MediaEntry, MediaEntry, QDistinct> distinctByUuid({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'uuid', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<MediaEntry, MediaEntry, QDistinct> distinctByYear() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'year');
@@ -5349,6 +5699,12 @@ extension MediaEntryQueryProperty
   QueryBuilder<MediaEntry, int, QQueryOperations> currentVolumeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'currentVolume');
+    });
+  }
+
+  QueryBuilder<MediaEntry, bool, QQueryOperations> dirtyProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'dirty');
     });
   }
 
@@ -5476,6 +5832,12 @@ extension MediaEntryQueryProperty
   QueryBuilder<MediaEntry, double?, QQueryOperations> userRatingProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'userRating');
+    });
+  }
+
+  QueryBuilder<MediaEntry, String, QQueryOperations> uuidProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'uuid');
     });
   }
 

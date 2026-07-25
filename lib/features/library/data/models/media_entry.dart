@@ -1,8 +1,11 @@
 import 'package:isar_community/isar.dart';
+import 'package:uuid/uuid.dart';
 
 import 'package:anivault/features/library/domain/enums.dart';
 
 part 'media_entry.g.dart';
+
+const _uuidGen = Uuid();
 
 /// Registro local de una obra (anime/manga/manhwa/manhua).
 ///
@@ -67,6 +70,17 @@ class MediaEntry {
 
   /// Fecha en que se agregó a la biblioteca.
   DateTime addedDate = DateTime.now();
+
+  // --- Sync opcional en la nube (ver core/sync) ---
+
+  /// Id estable entre dispositivos (el autoincrement de Isar es solo local).
+  /// Se genera una vez al crear la entrada y nunca cambia.
+  @Index(unique: true)
+  String uuid = _uuidGen.v4();
+
+  /// `true` si hay cambios locales sin subir aun. El SyncEngine la baja a
+  /// `false` tras un push exitoso.
+  bool dirty = true;
 
   MediaEntry({
     this.type = MediaType.anime,

@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import 'package:anivault/core/config/supabase_config.dart';
 import 'package:anivault/core/providers.dart';
+import 'package:anivault/core/sync/sync_settings.dart';
+import 'package:anivault/features/cloud_sync/data/cloud_auth_repository.dart';
+import 'package:anivault/features/cloud_sync/presentation/cloud_login_screen.dart';
 import 'package:anivault/services/prefs_service.dart';
 
 class SettingsPage extends HookConsumerWidget {
@@ -75,6 +79,11 @@ class SettingsPage extends HookConsumerWidget {
               onChanged: prefs.setAiModel,
             ),
           ),
+          if (SupabaseConfig.configurado) ...[
+            const Divider(),
+            const _SectionHeader('Sincronización'),
+            const _SyncTile(),
+          ],
           const Divider(),
           const _SectionHeader('Datos'),
           const ListTile(
@@ -105,6 +114,59 @@ class SettingsPage extends HookConsumerWidget {
           const SizedBox(height: 24),
         ],
       ),
+    );
+  }
+}
+
+class _SyncTile extends ConsumerWidget {
+  const _SyncTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(cloudCurrentUserProvider);
+    final frequency = ref.watch(syncFrequencyProvider);
+
+    if (user == null) {
+      return ListTile(
+        leading: const Icon(Icons.cloud_outlined),
+        title: const Text('Vincular con la nube'),
+        subtitle: const Text(
+          'Tu biblioteca ya se guarda en este dispositivo; esto agrega '
+          'una copia en la nube.',
+        ),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const CloudLoginScreen()),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        ListTile(
+          leading: const Icon(Icons.cloud_done_outlined),
+          title: Text(user.email ?? 'Cuenta vinculada'),
+          subtitle: const Text('Sync activo'),
+          trailing: TextButton(
+            onPressed: () => ref.read(cloudAuthRepositoryProvider).signOut(),
+            child: const Text('Desvincular'),
+          ),
+        ),
+        ListTile(
+          title: const Text('Frecuencia de sync'),
+          trailing: DropdownButton<SyncFrequency>(
+            value: frequency,
+            underline: const SizedBox.shrink(),
+            items: SyncFrequency.values
+                .map((f) => DropdownMenuItem(value: f, child: Text(f.label)))
+                .toList(),
+            onChanged: (f) {
+              if (f != null) {
+                ref.read(syncFrequencyProvider.notifier).setFrequency(f);
+              }
+            },
+          ),
+        ),
+      ],
     );
   }
 }
