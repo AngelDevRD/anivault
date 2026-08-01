@@ -1,12 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'package:anivault/core/config/supabase_config.dart';
 import 'package:anivault/core/providers.dart';
 import 'package:anivault/core/sync/sync_settings.dart';
 import 'package:anivault/features/cloud_sync/data/cloud_auth_repository.dart';
 import 'package:anivault/features/cloud_sync/presentation/cloud_login_screen.dart';
+import 'package:anivault/features/import_export/presentation/import_title_list_page.dart';
+import 'package:anivault/features/library/domain/enums.dart';
 import 'package:anivault/services/prefs_service.dart';
 
 class SettingsPage extends HookConsumerWidget {
@@ -86,17 +91,17 @@ class SettingsPage extends HookConsumerWidget {
           ],
           const Divider(),
           const _SectionHeader('Datos'),
-          const ListTile(
-            leading: Icon(Icons.file_download_outlined),
-            title: Text('Importar biblioteca'),
-            subtitle: Text('MyAnimeList, AniList, Kitsu, CSV, JSON'),
-            trailing: Chip(label: Text('Próximamente')),
+          ListTile(
+            leading: const Icon(Icons.file_download_outlined),
+            title: const Text('Importar biblioteca'),
+            subtitle: const Text('Lista de títulos o backup JSON'),
+            onTap: () => _showImportOptions(context, ref),
           ),
-          const ListTile(
-            leading: Icon(Icons.file_upload_outlined),
-            title: Text('Exportar biblioteca'),
-            subtitle: Text('JSON, CSV, PDF con estadísticas'),
-            trailing: Chip(label: Text('Próximamente')),
+          ListTile(
+            leading: const Icon(Icons.file_upload_outlined),
+            title: const Text('Exportar biblioteca'),
+            subtitle: const Text('Backup completo en JSON'),
+            onTap: () => _exportLibrary(context, ref),
           ),
           const ListTile(
             leading: Icon(Icons.notifications_outlined),
@@ -115,6 +120,98 @@ class SettingsPage extends HookConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+Future<void> _showImportOptions(BuildContext context, WidgetRef ref) async {
+  final choice = await showModalBottomSheet<String>(
+    context: context,
+    builder: (ctx) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.checklist_outlined),
+            title: const Text('Pegar lista de títulos'),
+            subtitle: const Text('Anime, manga, manhwa o manhua'),
+            onTap: () => Navigator.of(ctx).pop('titles'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.restore_outlined),
+            title: const Text('Restaurar backup (.json)'),
+            subtitle: const Text('Un archivo exportado previamente desde AniVault'),
+            onTap: () => Navigator.of(ctx).pop('backup'),
+          ),
+        ],
+      ),
+    ),
+  );
+  if (!context.mounted || choice == null) return;
+
+  if (choice == 'titles') {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const ImportTitleListPage(initialType: MediaType.anime),
+      ),
+    );
+    return;
+  }
+
+  final path = await showDialog<String>(
+    context: context,
+    builder: (ctx) {
+      final controller = TextEditingController();
+      return AlertDialog(
+        title: const Text('Restaurar backup'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            labelText: 'Ruta del archivo .json',
+            hintText: '/storage/emulated/0/Download/anivault_backup_....json',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
+            child: const Text('Restaurar'),
+          ),
+        ],
+      );
+    },
+  );
+  if (!context.mounted || path == null || path.isEmpty) return;
+
+  final messenger = ScaffoldMessenger.of(context);
+  try {
+    final result = await ref
+        .read(libraryBackupServiceProvider)
+        .importFromFile(File(path));
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          '${result.added} obras restauradas'
+          '${result.skipped > 0 ? ' · ${result.skipped} ya existían' : ''}',
+        ),
+      ),
+    );
+  } catch (e) {
+    messenger.showSnackBar(SnackBar(content: Text('No se pudo importar: $e')));
+  }
+}
+
+Future<void> _exportLibrary(BuildContext context, WidgetRef ref) async {
+  final messenger = ScaffoldMessenger.of(context);
+  try {
+    final file = await ref.read(libraryBackupServiceProvider).exportToFile();
+    await SharePlus.instance.share(
+      ShareParams(files: [XFile(file.path)], text: 'Backup de mi biblioteca AniVault'),
+    );
+  } catch (e) {
+    messenger.showSnackBar(SnackBar(content: Text('No se pudo exportar: $e')));
   }
 }
 

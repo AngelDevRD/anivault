@@ -1,81 +1,11 @@
 workflows:
-  android-workflow:
-    name: Android (APK + AAB)
-    max_build_duration: 60
-    instance_type: mac_mini_m2 # linux_x2 requiere plan de pago; mac_mini_m2 es la unica instancia gratuita
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: main
-          include: true
-          source: true
-    environment:
-      groups:
-        - portfolio_release # RELEASE_GH_TOKEN, WEBHOOK_SECRET (compartido entre las 4 apps)
-      android_signing:
-        - anivault_keystore # subir el keystore en Codemagic > Code signing identities
-      vars:
-        PACKAGE_NAME: "com.anivault.anivault"
-        REPO: "AngelDevRD/anivault"
-      flutter: stable
-    cache:
-      cache_paths:
-        - $HOME/.pub-cache
-        - $FLUTTER_ROOT/.pub-cache
-    scripts:
-      - name: Instalar dependencias
-        script: flutter pub get
-      - name: Analizar
-        script: flutter analyze
-      - name: Compilar APK (release, firmado)
-        script: flutter build apk --release
-      - name: Compilar AAB (release, para Google Play)
-        script: flutter build appbundle --release
-      - name: Renombrar artefactos para la tienda automatica
-        script: |
-          cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/anivault-android.apk
-          cp build/app/outputs/bundle/release/app-release.aab build/app/outputs/bundle/release/anivault-android.aab
-      - name: Publicar release en GitHub y notificar al portafolio
-        script: |
-          CURL_RETRY="--retry 3 --retry-delay 5 --retry-connrefused --retry-all-errors --http1.1"
-          TAG="v$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)"
-          echo "TAG=$TAG"
-          GET_RESP=$(curl -s -w "\nHTTP:%{http_code}" $CURL_RETRY -H "Authorization: Bearer $RELEASE_GH_TOKEN" \
-            "https://api.github.com/repos/$REPO/releases/tags/$TAG")
-          echo "GET release/tags response: $GET_RESP"
-          RELEASE_ID=$(echo "$GET_RESP" | grep -o '"id": *[0-9]*' | head -1 | grep -o '[0-9]*')
-          if [ -z "$RELEASE_ID" ]; then
-            CREATE_RESP=$(curl -s -w "\nHTTP:%{http_code}" $CURL_RETRY -X POST -H "Authorization: Bearer $RELEASE_GH_TOKEN" -H "Content-Type: application/json" \
-              -d "{\"tag_name\":\"$TAG\",\"generate_release_notes\":true}" \
-              "https://api.github.com/repos/$REPO/releases")
-            echo "POST release response: $CREATE_RESP"
-            RELEASE_ID=$(echo "$CREATE_RESP" | grep -o '"id": *[0-9]*' | head -1 | grep -o '[0-9]*')
-          fi
-          echo "RELEASE_ID=$RELEASE_ID"
-          if [ -z "$RELEASE_ID" ]; then
-            echo "ERROR: no se pudo obtener/crear el release, abortando antes de subir assets"
-            exit 1
-          fi
-          curl -s -w "\nHTTP:%{http_code}\n" $CURL_RETRY -X POST -H "Authorization: Bearer $RELEASE_GH_TOKEN" -H "Content-Type: application/vnd.android.package-archive" \
-            --data-binary @build/app/outputs/flutter-apk/anivault-android.apk \
-            "https://uploads.github.com/repos/$REPO/releases/$RELEASE_ID/assets?name=anivault-android.apk"
-          curl -s -w "\nHTTP:%{http_code}\n" $CURL_RETRY -X POST -H "Authorization: Bearer $RELEASE_GH_TOKEN" -H "Content-Type: application/octet-stream" \
-            --data-binary @build/app/outputs/bundle/release/anivault-android.aab \
-            "https://uploads.github.com/repos/$REPO/releases/$RELEASE_ID/assets?name=anivault-android.aab"
-          curl -s -w "\nHTTP:%{http_code}\n" $CURL_RETRY -X POST -H "Content-Type: application/json" \
-            -d '{"workflowId":"android-workflow","buildStatus":"success"}' \
-            "https://portfolio-five-zeta-xf21p0a5se.vercel.app/api/orchestrator/webhook?owner=AngelDevRD&repo=anivault&secret=$WEBHOOK_SECRET"
-    artifacts:
-      - build/app/outputs/flutter-apk/anivault-android.apk
-      - build/app/outputs/bundle/release/anivault-android.aab
-    publishing:
-      email:
-        recipients:
-          - leybayesenia1975@gmail.com
-        notify:
-          success: true
-          failure: true
+  # android-workflow removido: duplicaba el build/release del APK con
+  # .github/workflows/release-android.yml (gratis en GitHub Actions) y ambos
+  # subiendo el mismo asset al mismo tag de release generaba conflictos.
+  # Ademas se detecto que este workflow nunca firmaba con la release key: el
+  # build.gradle.kts no leia key.properties, asi que "release, firmado" en
+  # realidad usaba las debug keys. Ya corregido en build.gradle.kts (ambos
+  # sistemas de build ahora firman correctamente si key.properties existe).
 
   ios-workflow:
     name: iOS (IPA)

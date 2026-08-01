@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:anivault/features/add_media/data/media_search_repository.dart';
+import 'package:anivault/features/import_export/data/library_backup_service.dart';
 import 'package:anivault/services/anilist_api.dart';
 import 'package:anivault/services/isar_service.dart';
 import 'package:anivault/services/jikan_api.dart';
@@ -41,6 +42,10 @@ final mediaSearchRepositoryProvider = Provider<MediaSearchRepository>((ref) {
     ref.watch(aniListApiProvider),
     ref.watch(jikanApiProvider),
   );
+});
+
+final libraryBackupServiceProvider = Provider<LibraryBackupService>((ref) {
+  return LibraryBackupService(ref.watch(isarServiceProvider));
 });
 
 /// Modo de tema, persistido en preferencias.

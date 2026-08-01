@@ -1,0 +1,59 @@
+name: Release Android
+
+# Compila y firma el APK en GitHub Actions (gratis), en vez de depender del
+# android-workflow de Codemagic (minutos de build limitados en el plan free).
+# Requiere estos secrets en el repo (ver keystore-secret/ local, nunca se sube):
+#   ANDROID_KEYSTORE_BASE64  -> base64 de keystore-secret/anivault-release.jks
+#   ANDROID_KEY_ALIAS        -> KEY_ALIAS en anivault-keystore-credentials.txt
+#   ANDROID_KEY_PASSWORD     -> KEY_PASSWORD en anivault-keystore-credentials.txt
+#   ANDROID_STORE_PASSWORD   -> STORE_PASSWORD en anivault-keystore-credentials.txt
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Preparar firma de release
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/anivault-release.jks
+          cat > android/key.properties <<EOF
+          storeFile=anivault-release.jks
+          storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+          EOF
+
+      - run: flutter pub get
+
+      - run: flutter build apk --release
+
+      - name: Renombrar artefacto
+        run: cp build/app/outputs/flutter-apk/app-release.apk anivault-android.apk
+
+      - name: Calcular tag desde pubspec.yaml
+        id: tag
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
+          echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          generate_release_notes: true
+          files: anivault-android.apk
