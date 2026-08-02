@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -32,13 +33,25 @@ class MediaDetailPage extends ConsumerWidget {
   }
 }
 
-class _DetailBody extends ConsumerWidget {
+class _DetailBody extends HookConsumerWidget {
   const _DetailBody({required this.entry});
 
   final MediaEntry entry;
 
-  Future<void> _save(WidgetRef ref) =>
-      ref.read(isarServiceProvider).upsert(entry);
+  /// Guarda en segundo plano sin bloquear la UI: el repintado ya ocurrió
+  /// via [_touch] antes de llamar esto (Optimistic UI). El stream de
+  /// biblioteca eventualmente confirma el cambio, pero el usuario ya lo ve.
+  void _save(WidgetRef ref) {
+    ref.read(isarServiceProvider).upsert(entry);
+  }
+
+  /// Fuerza un repintado inmediato de esta pantalla (los campos de [entry]
+  /// ya se mutaron in-place; sin esto habría que esperar a que el cambio
+  /// complete el viaje por Isar y el stream de biblioteca para verse).
+  void _touch(ValueNotifier<int> tick, WidgetRef ref) {
+    tick.value++;
+    _save(ref);
+  }
 
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
     final ok = await showDialog<bool>(
@@ -64,7 +77,7 @@ class _DetailBody extends ConsumerWidget {
     }
   }
 
-  void _changeStatus(WidgetRef ref, MediaStatus status) {
+  void _changeStatus(ValueNotifier<int> tick, WidgetRef ref, MediaStatus status) {
     entry.status = status;
     if (status == MediaStatus.watching && entry.startDate == null) {
       entry.startDate = DateTime.now();
@@ -79,24 +92,34 @@ class _DetailBody extends ConsumerWidget {
         }
       }
     }
-    _save(ref);
+    _touch(tick, ref);
   }
 
-  void _bumpUnit(WidgetRef ref, int delta) {
+  /// Sube/baja el progreso y ajusta el estado automáticamente: pasa a
+  /// "en progreso" al empezar, a "completado" al alcanzar el total, y
+  /// vuelve a "en progreso" si el progreso baja de nuevo por debajo del total.
+  void _bumpUnit(ValueNotifier<int> tick, WidgetRef ref, int delta) {
     if (entry.type == MediaType.anime) {
       entry.currentEpisode = (entry.currentEpisode + delta).clamp(0, 1 << 30);
     } else {
       entry.currentChapter = (entry.currentChapter + delta).clamp(0, 1 << 30);
     }
-    if (entry.status == MediaStatus.pending) {
+    final total = entry.totalUnits;
+    if (entry.status == MediaStatus.pending && entry.currentUnits > 0) {
       entry.status = MediaStatus.watching;
       entry.startDate ??= DateTime.now();
     }
-    _save(ref);
+    if (total != null && entry.currentUnits >= total) {
+      entry.status = MediaStatus.completed;
+    } else if (entry.status == MediaStatus.completed) {
+      entry.status = MediaStatus.watching;
+    }
+    _touch(tick, ref);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tick = useState(0);
     final theme = Theme.of(context);
     final isAnime = entry.type == MediaType.anime;
     final unitWord = isAnime ? 'Episodio' : 'Capítulo';
@@ -115,7 +138,7 @@ class _DetailBody extends ConsumerWidget {
               color: entry.favorite ? Colors.redAccent : null,
               onPressed: () {
                 entry.favorite = !entry.favorite;
-                _save(ref);
+                _touch(tick, ref);
               },
             ),
             IconButton(
@@ -196,7 +219,7 @@ class _DetailBody extends ConsumerWidget {
                           context,
                           s,
                         ).withValues(alpha: 0.25),
-                        onSelected: (_) => _changeStatus(ref, s),
+                        onSelected: (_) => _changeStatus(tick, ref, s),
                       ),
                   ],
                 ),
@@ -222,12 +245,12 @@ class _DetailBody extends ConsumerWidget {
                             ),
                             IconButton.filledTonal(
                               icon: const Icon(Icons.remove),
-                              onPressed: () => _bumpUnit(ref, -1),
+                              onPressed: () => _bumpUnit(tick, ref, -1),
                             ),
                             const SizedBox(width: 8),
                             IconButton.filledTonal(
                               icon: const Icon(Icons.add),
-                              onPressed: () => _bumpUnit(ref, 1),
+                              onPressed: () => _bumpUnit(tick, ref, 1),
                             ),
                           ],
                         ),
@@ -260,7 +283,7 @@ class _DetailBody extends ConsumerWidget {
                                         0,
                                         1 << 30,
                                       );
-                                  _save(ref);
+                                  _touch(tick, ref);
                                 },
                               ),
                               const SizedBox(width: 8),
@@ -268,7 +291,7 @@ class _DetailBody extends ConsumerWidget {
                                 icon: const Icon(Icons.add),
                                 onPressed: () {
                                   entry.currentVolume += 1;
-                                  _save(ref);
+                                  _touch(tick, ref);
                                 },
                               ),
                             ],
@@ -293,7 +316,7 @@ class _DetailBody extends ConsumerWidget {
                         label: (entry.userRating ?? 0).toStringAsFixed(1),
                         onChanged: (v) {
                           entry.userRating = v == 0 ? null : v;
-                          _save(ref);
+                          _touch(tick, ref);
                         },
                       ),
                     ),
