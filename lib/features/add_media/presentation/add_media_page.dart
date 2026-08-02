@@ -21,7 +21,7 @@ class AddMediaPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = useTextEditingController();
-    final saving = useState<int?>(null); // sourceId en proceso de guardado
+    final saving = useState<String?>(null); // sourceId en proceso de guardado
     final debounce = useRef<Timer?>(null);
 
     useEffect(
@@ -46,7 +46,7 @@ class AddMediaPage extends HookConsumerWidget {
         final repo = ref.read(mediaSearchRepositoryProvider);
         final isar = ref.read(isarServiceProvider);
         final existing = s.source == MediaSource.anilist
-            ? await isar.findByAnilistId(s.sourceId, s.type)
+            ? await isar.findByAnilistId(int.parse(s.sourceId), s.type)
             : null;
         if (existing != null) {
           messenger.showSnackBar(

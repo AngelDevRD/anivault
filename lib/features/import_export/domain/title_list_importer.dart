@@ -64,7 +64,7 @@ Future<TitleListImportResult> importTitleList({
       } else {
         final top = results.first;
         final existing = top.source == MediaSource.anilist
-            ? await isar.findByAnilistId(top.sourceId, type)
+            ? await isar.findByAnilistId(int.parse(top.sourceId), type)
             : null;
         if (existing != null) {
           duplicated++;

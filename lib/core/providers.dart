@@ -7,6 +7,7 @@ import 'package:anivault/features/import_export/data/library_backup_service.dart
 import 'package:anivault/services/anilist_api.dart';
 import 'package:anivault/services/isar_service.dart';
 import 'package:anivault/services/jikan_api.dart';
+import 'package:anivault/services/mangadex_api.dart';
 import 'package:anivault/services/prefs_service.dart';
 
 /// Servicios inicializados de forma asíncrona en `main()` y sobreescritos
@@ -37,10 +38,15 @@ final jikanApiProvider = Provider<JikanApi>(
   (ref) => JikanApi(ref.watch(dioProvider)),
 );
 
+final mangaDexApiProvider = Provider<MangaDexApi>(
+  (ref) => MangaDexApi(ref.watch(dioProvider)),
+);
+
 final mediaSearchRepositoryProvider = Provider<MediaSearchRepository>((ref) {
   return MediaSearchRepository(
     ref.watch(aniListApiProvider),
     ref.watch(jikanApiProvider),
+    ref.watch(mangaDexApiProvider),
   );
 });
 

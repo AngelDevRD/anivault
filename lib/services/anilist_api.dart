@@ -127,7 +127,7 @@ class AniListApi {
   MediaSuggestion _toSuggestion(Map<String, dynamic> m, MediaType requested) {
     return MediaSuggestion(
       source: MediaSource.anilist,
-      sourceId: m['id'] as int,
+      sourceId: (m['id'] as int).toString(),
       type: _inferType(requested, m['countryOfOrigin'] as String?),
       title: _pickTitle(m['title'] as Map<String, dynamic>?) ?? 'Sin título',
       coverImage: m['coverImage']?['large'] as String?,

@@ -46,7 +46,7 @@ class ImportReviewPage extends HookConsumerWidget {
       final isar = ref.read(isarServiceProvider);
       final repo = ref.read(mediaSearchRepositoryProvider);
       final existing = picked.source == MediaSource.anilist
-          ? await isar.findByAnilistId(picked.sourceId, type)
+          ? await isar.findByAnilistId(int.parse(picked.sourceId), type)
           : null;
       if (existing == null) {
         final entry = await repo.fetchDetail(picked);

@@ -1,7 +1,7 @@
 import 'package:anivault/features/library/domain/enums.dart';
 
 /// Fuente de datos de la que proviene una sugerencia.
-enum MediaSource { anilist, jikan }
+enum MediaSource { anilist, jikan, mangadex }
 
 /// Resultado de búsqueda mostrado como sugerencia al agregar una obra.
 /// Contiene lo mínimo para la lista; el detalle completo se baja al seleccionar.
@@ -22,8 +22,8 @@ class MediaSuggestion {
   /// De dónde vino la sugerencia (define cómo bajar el detalle).
   final MediaSource source;
 
-  /// Id en la fuente correspondiente (AniList id o MAL id).
-  final int sourceId;
+  /// Id en la fuente correspondiente (AniList id, MAL id o uuid de MangaDex).
+  final String sourceId;
 
   final MediaType type;
   final String title;

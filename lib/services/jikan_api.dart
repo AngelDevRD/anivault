@@ -44,7 +44,7 @@ class JikanApi {
   MediaSuggestion _toSuggestion(Map<String, dynamic> m, MediaType type) {
     return MediaSuggestion(
       source: MediaSource.jikan,
-      sourceId: m['mal_id'] as int,
+      sourceId: (m['mal_id'] as int).toString(),
       type: type,
       title: m['title'] as String? ?? 'Sin título',
       coverImage: m['images']?['jpg']?['image_url'] as String?,
