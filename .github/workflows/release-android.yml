@@ -2,11 +2,12 @@ name: Release Android
 
 # Compila y firma el APK en GitHub Actions (gratis), en vez de depender del
 # android-workflow de Codemagic (minutos de build limitados en el plan free).
-# Requiere estos secrets en el repo (ver keystore-secret/ local, nunca se sube):
-#   ANDROID_KEYSTORE_BASE64  -> base64 de keystore-secret/anivault-release.jks
-#   ANDROID_KEY_ALIAS        -> KEY_ALIAS en anivault-keystore-credentials.txt
-#   ANDROID_KEY_PASSWORD     -> KEY_PASSWORD en anivault-keystore-credentials.txt
-#   ANDROID_STORE_PASSWORD   -> STORE_PASSWORD en anivault-keystore-credentials.txt
+# Requiere estos secrets en el repo (ver keystore-secret/ local, nunca se sube;
+# misma convencion de nombres que finanzas360/nexfit):
+#   ANDROID_KEYSTORE_BASE64    -> base64 de keystore-secret/anivault-release.jks
+#   ANDROID_KEYSTORE_PASSWORD  -> STORE_PASSWORD en anivault-keystore-credentials.txt
+#   ANDROID_KEY_ALIAS          -> KEY_ALIAS en anivault-keystore-credentials.txt
+#   ANDROID_KEY_PASSWORD       -> KEY_PASSWORD en anivault-keystore-credentials.txt
 on:
   push:
     branches: [main]
@@ -40,7 +41,7 @@ jobs:
             | base64 -d --ignore-garbage > android/app/anivault-release.jks
           cat > android/key.properties <<EOF
           storeFile=anivault-release.jks
-          storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}
+          storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
           keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
           EOF
@@ -49,7 +50,7 @@ jobs:
         run: |
           keytool -list \
             -keystore android/app/anivault-release.jks \
-            -storepass "${{ secrets.ANDROID_STORE_PASSWORD }}" \
+            -storepass "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
             -alias "${{ secrets.ANDROID_KEY_ALIAS }}"
 
       - run: flutter pub get
