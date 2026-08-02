@@ -1,4 +1,5 @@
 import 'package:anivault/features/library/data/models/media_entry.dart';
+import 'package:anivault/features/library/domain/enums.dart';
 
 /// Categoría de una obra dentro de su franquicia, para la vista expandida
 /// (Anime principal/Temporadas, Películas, OVAs, ONAs, Especiales, Spin-offs).
@@ -90,6 +91,25 @@ List<FranchiseGroup> groupByFranchise(List<MediaEntry> entries) {
         members: membersByKey[key]!,
       ),
   ];
+}
+
+/// De qué obra "sigue" el usuario dentro de su franquicia: la más próxima
+/// en orden cronológico (por año, a través de todas las categorías) que
+/// todavía esté "Pendiente" y venga después de [completed]. `null` si
+/// [completed] no pertenece a la lista, o si no hay ninguna pendiente
+/// después de ella.
+MediaEntry? nextToWatchAfter(MediaEntry completed, List<MediaEntry> franchiseMembers) {
+  final chronological = [...franchiseMembers]
+    ..sort((a, b) => (a.year ?? 999999).compareTo(b.year ?? 999999));
+  final index = chronological.indexWhere((e) => e.id == completed.id);
+  if (index == -1) return null;
+
+  for (var i = index + 1; i < chronological.length; i++) {
+    if (chronological[i].status == MediaStatus.pending) {
+      return chronological[i];
+    }
+  }
+  return null;
 }
 
 MediaEntry _pickRoot(List<MediaEntry> members) {

@@ -5,22 +5,45 @@ import 'package:go_router/go_router.dart';
 import 'package:anivault/core/providers.dart';
 import 'package:anivault/features/library/data/models/media_entry.dart';
 import 'package:anivault/features/library/domain/enums.dart';
+import 'package:anivault/features/library/domain/franchise_group.dart';
 import 'package:anivault/features/library/presentation/library_providers.dart';
 import 'package:anivault/features/statistics/presentation/stats_providers.dart';
 import 'package:anivault/shared/widgets/media_cover.dart';
 import 'package:anivault/shared/widgets/stat_tile.dart';
 
-/// Obras en curso (estado "viéndolo"), ordenadas por última actualización.
+/// Obras en curso (estado "viéndolo") más la siguiente obra pendiente de
+/// cada franquicia recién completada (ver `nextToWatchAfter`), ordenadas
+/// por última actualización.
 final continueWatchingProvider = FutureProvider<List<MediaEntry>>((ref) async {
   ref.watch(libraryRevisionProvider);
   final all = await ref.watch(isarServiceProvider).getAll();
-  final watching = all.where((e) => e.status == MediaStatus.watching).toList()
+
+  final byFranchise = <String, List<MediaEntry>>{};
+  for (final e in all) {
+    if (e.franchiseId != null) {
+      byFranchise.putIfAbsent(e.franchiseId!, () => []).add(e);
+    }
+  }
+
+  final upNext = <MediaEntry>[];
+  for (final e in all) {
+    if (e.status != MediaStatus.completed || e.franchiseId == null) continue;
+    final next = nextToWatchAfter(e, byFranchise[e.franchiseId]!);
+    if (next != null) upNext.add(next);
+  }
+
+  final combined = <int, MediaEntry>{
+    for (final e in all.where((e) => e.status == MediaStatus.watching)) e.id: e,
+    for (final e in upNext) e.id: e,
+  };
+
+  final result = combined.values.toList()
     ..sort(
       (a, b) => (b.lastUpdatedDate ?? b.addedDate).compareTo(
         a.lastUpdatedDate ?? a.addedDate,
       ),
     );
-  return watching.take(10).toList();
+  return result.take(10).toList();
 });
 
 class HomePage extends ConsumerWidget {
@@ -121,9 +144,11 @@ class _ContinueCard extends StatelessWidget {
               style: Theme.of(context).textTheme.labelMedium,
             ),
             Text(
-              total != null
-                  ? '${entry.currentUnits}/$total'
-                  : '${entry.currentUnits}',
+              entry.status == MediaStatus.pending
+                  ? 'Nuevo'
+                  : (total != null
+                        ? '${entry.currentUnits}/$total'
+                        : '${entry.currentUnits}'),
               style: Theme.of(context).textTheme.labelSmall,
             ),
           ],

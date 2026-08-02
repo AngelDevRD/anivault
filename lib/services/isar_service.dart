@@ -60,6 +60,11 @@ class IsarService {
     return isar.mediaEntrys.filter().anilistIdEqualTo(anilistId).findFirst();
   }
 
+  /// Todos los miembros de una franquicia (para calcular "qué sigue").
+  Future<List<MediaEntry>> findByFranchiseId(String franchiseId) {
+    return isar.mediaEntrys.filter().franchiseIdEqualTo(franchiseId).findAll();
+  }
+
   /// Todas las obras (para el motor de estadísticas y exportación).
   Future<List<MediaEntry>> getAll() => isar.mediaEntrys.where().findAll();
 

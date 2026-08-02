@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -205,6 +206,8 @@ class _DetailBody extends HookConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 20),
+
+                _NextToWatchBanner(entryId: entry.id),
 
                 // Estado
                 Text('Estado', style: theme.textTheme.titleMedium),
@@ -458,6 +461,52 @@ class _MetaChip extends StatelessWidget {
             style: TextStyle(fontSize: 12, color: scheme.onSecondaryContainer),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Si la obra está "Completada" y hay una siguiente pendiente en la misma
+/// franquicia (ver `nextToWatchAfter`), invita a continuar con ella.
+class _NextToWatchBanner extends ConsumerWidget {
+  const _NextToWatchBanner({required this.entryId});
+
+  final int entryId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final next = ref.watch(nextToWatchProvider(entryId)).value;
+    if (next == null) return const SizedBox.shrink();
+
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: theme.colorScheme.primaryContainer,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => context.push('/detail/${next.id}'),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Continuar con ${next.title}',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: theme.colorScheme.onPrimaryContainer,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward,
+                  color: theme.colorScheme.onPrimaryContainer,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
