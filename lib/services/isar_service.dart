@@ -53,6 +53,13 @@ class IsarService {
         .findFirst();
   }
 
+  /// Igual que [findByAnilistId] pero sin filtrar por tipo (los ids de
+  /// AniList son únicos en todo su catálogo). Se usa para saber si una obra
+  /// relacionada ya está en la biblioteca sin tener que adivinar su tipo.
+  Future<MediaEntry?> findByAnilistIdAnyType(int anilistId) {
+    return isar.mediaEntrys.filter().anilistIdEqualTo(anilistId).findFirst();
+  }
+
   /// Todas las obras (para el motor de estadísticas y exportación).
   Future<List<MediaEntry>> getAll() => isar.mediaEntrys.where().findAll();
 

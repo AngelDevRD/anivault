@@ -5,8 +5,11 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:anivault/core/providers.dart';
+import 'package:anivault/features/add_media/domain/franchise_suggestions.dart';
+import 'package:anivault/features/add_media/domain/media_relation.dart';
 import 'package:anivault/features/add_media/domain/media_suggestion.dart';
 import 'package:anivault/features/add_media/presentation/add_providers.dart';
+import 'package:anivault/features/add_media/presentation/related_suggestions_sheet.dart';
 import 'package:anivault/features/library/data/franchise_linker.dart';
 import 'package:anivault/features/library/domain/enums.dart';
 import 'package:anivault/shared/widgets/empty_state.dart';
@@ -62,6 +65,11 @@ class AddMediaPage extends HookConsumerWidget {
         messenger.showSnackBar(
           SnackBar(content: Text('Agregado: ${result.entry.title}')),
         );
+
+        final missing = await findMissingRelated(result.relations, isar);
+        if (missing.isNotEmpty && context.mounted) {
+          await _offerRelated(context, ref, missing);
+        }
         navigator.pop();
       } catch (e) {
         saving.value = null;
@@ -156,5 +164,40 @@ class AddMediaPage extends HookConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+/// Muestra las obras relacionadas encontradas (películas, OVAs, secuelas...)
+/// y agrega las que el usuario elija, uniéndolas a la misma franquicia.
+Future<void> _offerRelated(
+  BuildContext context,
+  WidgetRef ref,
+  List<MediaRelation> missing,
+) async {
+  final selected = await showModalBottomSheet<List<MediaRelation>>(
+    context: context,
+    isScrollControlled: true,
+    builder: (_) => RelatedSuggestionsSheet(relations: missing),
+  );
+  if (selected == null || selected.isEmpty) return;
+
+  final repo = ref.read(mediaSearchRepositoryProvider);
+  final isar = ref.read(isarServiceProvider);
+  for (final rel in selected) {
+    try {
+      final suggestion = MediaSuggestion(
+        source: MediaSource.anilist,
+        sourceId: rel.anilistId.toString(),
+        type: rel.mediaType == 'ANIME' ? MediaType.anime : MediaType.manga,
+        title: rel.title,
+        coverImage: rel.coverImage,
+        format: rel.format,
+      );
+      final result = await repo.fetchDetail(suggestion);
+      await linkFranchise(result.entry, result.relations, isar);
+      await isar.upsert(result.entry);
+    } catch (_) {
+      // Si una falla (ej. red), se sigue con el resto de la selección.
+    }
   }
 }

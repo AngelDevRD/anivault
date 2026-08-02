@@ -57,7 +57,13 @@ class AniListApi {
         relations {
           edges {
             relationType(version: 2)
-            node { id }
+            node {
+              id
+              type
+              format
+              title { romaji }
+              coverImage { medium }
+            }
           }
         }
       }
@@ -101,10 +107,20 @@ class AniListApi {
     return edges
         .cast<Map<String, dynamic>>()
         .map((e) {
-          final nodeId = e['node']?['id'] as int?;
+          final node = e['node'] as Map<String, dynamic>?;
+          final nodeId = node?['id'] as int?;
           final relationType = e['relationType'] as String?;
-          if (nodeId == null || relationType == null) return null;
-          return MediaRelation(anilistId: nodeId, relationType: relationType);
+          if (node == null || nodeId == null || relationType == null) {
+            return null;
+          }
+          return MediaRelation(
+            anilistId: nodeId,
+            relationType: relationType,
+            title: _pickTitle(node['title'] as Map<String, dynamic>?) ?? 'Sin título',
+            coverImage: node['coverImage']?['medium'] as String?,
+            format: node['format'] as String?,
+            mediaType: node['type'] as String? ?? 'ANIME',
+          );
         })
         .whereType<MediaRelation>()
         .toList();
