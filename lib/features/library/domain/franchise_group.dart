@@ -52,6 +52,22 @@ class FranchiseGroup {
   final List<MediaEntry> members;
 
   bool get isFranchise => members.length > 1;
+
+  /// [members] clasificados por categoría y ordenados cronológicamente
+  /// dentro de cada una (temporada 1, 2, 3...), para la vista expandida.
+  /// Las categorías vacías no aparecen; recorrer [FranchiseBucket.values]
+  /// ya da el orden Temporadas → Películas → OVAs → ONAs → Especiales →
+  /// Spin-offs.
+  Map<FranchiseBucket, List<MediaEntry>> get bucketed {
+    final result = <FranchiseBucket, List<MediaEntry>>{};
+    for (final e in members) {
+      result.putIfAbsent(bucketOf(e), () => []).add(e);
+    }
+    for (final list in result.values) {
+      list.sort((a, b) => (a.year ?? 999999).compareTo(b.year ?? 999999));
+    }
+    return result;
+  }
 }
 
 /// Agrupa una lista plana de obras (ya filtrada/ordenada) por `franchiseId`.

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:anivault/features/library/data/models/media_entry.dart';
 import 'package:anivault/features/library/domain/enums.dart';
 import 'package:anivault/features/library/domain/franchise_group.dart';
 import 'package:anivault/features/library/presentation/library_providers.dart';
@@ -76,10 +75,7 @@ class LibraryTab extends ConsumerWidget {
 /// Películas, OVAs, ONAs, Especiales, Spin-offs). Cada una lleva a su
 /// propia ficha de detalle y progreso.
 void _showFranchiseSheet(BuildContext context, FranchiseGroup group) {
-  final byBucket = <FranchiseBucket, List<MediaEntry>>{};
-  for (final e in group.members) {
-    byBucket.putIfAbsent(bucketOf(e), () => []).add(e);
-  }
+  final byBucket = group.bucketed;
 
   showModalBottomSheet<void>(
     context: context,
