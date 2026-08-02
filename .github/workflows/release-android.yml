@@ -31,13 +31,26 @@ jobs:
 
       - name: Preparar firma de release
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/anivault-release.jks
+          # grep -v descarta encabezados tipo "-----BEGIN...-----" si el base64
+          # se genero con certutil u otra herramienta que los agrega; tr quita
+          # saltos de linea/espacios que pudieran colarse al copiar el secret.
+          printf '%s' "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" \
+            | grep -v -- '-----' \
+            | tr -d '\r\n ' \
+            | base64 -d --ignore-garbage > android/app/anivault-release.jks
           cat > android/key.properties <<EOF
           storeFile=anivault-release.jks
           storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}
           keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
           keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
           EOF
+
+      - name: Verificar keystore (falla rapido si el secret esta mal)
+        run: |
+          keytool -list \
+            -keystore android/app/anivault-release.jks \
+            -storepass "${{ secrets.ANDROID_STORE_PASSWORD }}" \
+            -alias "${{ secrets.ANDROID_KEY_ALIAS }}"
 
       - run: flutter pub get
 
