@@ -3,9 +3,11 @@ import 'package:anivault/features/library/data/models/media_entry.dart';
 import 'package:anivault/features/library/domain/enums.dart';
 
 /// Constantes de estimación para obras de lectura.
+///
+/// El tiempo de lectura no se cuenta en "Tiempo total" (solo aplica a
+/// anime): capítulos/páginas leídos se muestran como su propia métrica.
 class ReadingEstimates {
   static const pagesPerChapter = 20;
-  static const minutesPerChapter = 5; // lectura media de un capítulo
 }
 
 /// Estadísticas de un grupo de obras de un mismo tipo.
@@ -211,11 +213,11 @@ class StatsEngine {
     );
   }
 
-  /// Minutos consumidos por una obra (anime por duración; lectura estimada).
-  static int _minutes(MediaEntry e) {
-    if (e.type == MediaType.anime) return e.minutesWatched;
-    return e.currentChapter * ReadingEstimates.minutesPerChapter;
-  }
+  /// Minutos consumidos por una obra. Solo el anime tiene tiempo real
+  /// (episodios × duración); la lectura se mide en capítulos/páginas, no
+  /// en minutos estimados (ver [ReadingEstimates]).
+  static int _minutes(MediaEntry e) =>
+      e.type == MediaType.anime ? e.minutesWatched : 0;
 
   /// Longitud total conocida (episodios o capítulos) para "más largo/corto".
   static int _totalLen(MediaEntry e) => e.type == MediaType.anime

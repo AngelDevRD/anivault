@@ -134,10 +134,18 @@ class MediaEntry {
   }
 
   /// Minutos totales consumidos en este anime (0 para obras de lectura).
+  ///
+  /// Si la obra está "Completada" pero `currentEpisode` no llegó al total
+  /// (películas/OVAs/especiales donde `totalEpisodes` no se conocía al
+  /// agregarla), se cuenta como vista por completo para no perder el
+  /// tiempo real invertido.
   @ignore
   int get minutesWatched {
     if (type != MediaType.anime) return 0;
     final dur = episodeDuration ?? 24; // duración estándar por defecto
-    return currentEpisode * dur;
+    final watchedUnits = status == MediaStatus.completed
+        ? (totalEpisodes ?? (currentEpisode > 0 ? currentEpisode : 1))
+        : currentEpisode;
+    return watchedUnits * dur;
   }
 }

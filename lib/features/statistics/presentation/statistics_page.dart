@@ -201,7 +201,7 @@ class _GroupCard extends StatelessWidget {
         ('Volúmenes leídos', '${group.volumesRead}'),
         ('Páginas estimadas', '${group.estimatedPages}'),
       ],
-      ('Tiempo', group.time.compact),
+      if (isAnime) ('Tiempo', group.time.compact),
       ('Promedio', group.avgUnits.toTrimmed(1)),
       if (group.avgScore > 0) ('Puntuación media', group.avgScore.toTrimmed(1)),
       if (group.longest != null) ('Más largo', group.longest!.title),
