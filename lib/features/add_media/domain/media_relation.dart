@@ -11,6 +11,8 @@ class MediaRelation {
     required this.mediaType,
     this.coverImage,
     this.format,
+    this.year,
+    this.units,
   });
 
   /// Id en AniList de la obra relacionada.
@@ -28,4 +30,9 @@ class MediaRelation {
 
   /// Tipo de medio en AniList: ANIME o MANGA.
   final String mediaType;
+
+  final int? year;
+
+  /// Episodios (anime) o capítulos (manga), lo que reporte AniList.
+  final int? units;
 }

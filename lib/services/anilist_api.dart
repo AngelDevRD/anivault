@@ -63,6 +63,9 @@ class AniListApi {
               format
               title { romaji }
               coverImage { medium }
+              startDate { year }
+              episodes
+              chapters
             }
           }
         }
@@ -113,13 +116,18 @@ class AniListApi {
           if (node == null || nodeId == null || relationType == null) {
             return null;
           }
+          final mediaType = node['type'] as String? ?? 'ANIME';
           return MediaRelation(
             anilistId: nodeId,
             relationType: relationType,
             title: _pickTitle(node['title'] as Map<String, dynamic>?) ?? 'Sin título',
             coverImage: node['coverImage']?['medium'] as String?,
             format: node['format'] as String?,
-            mediaType: node['type'] as String? ?? 'ANIME',
+            mediaType: mediaType,
+            year: node['startDate']?['year'] as int?,
+            units: mediaType == 'ANIME'
+                ? node['episodes'] as int?
+                : node['chapters'] as int?,
           );
         })
         .whereType<MediaRelation>()

@@ -181,23 +181,9 @@ Future<void> _offerRelated(
   );
   if (selected == null || selected.isEmpty) return;
 
-  final repo = ref.read(mediaSearchRepositoryProvider);
-  final isar = ref.read(isarServiceProvider);
-  for (final rel in selected) {
-    try {
-      final suggestion = MediaSuggestion(
-        source: MediaSource.anilist,
-        sourceId: rel.anilistId.toString(),
-        type: rel.mediaType == 'ANIME' ? MediaType.anime : MediaType.manga,
-        title: rel.title,
-        coverImage: rel.coverImage,
-        format: rel.format,
-      );
-      final result = await repo.fetchDetail(suggestion);
-      await linkFranchise(result.entry, result.relations, isar);
-      await isar.upsert(result.entry);
-    } catch (_) {
-      // Si una falla (ej. red), se sigue con el resto de la selección.
-    }
-  }
+  await addSelectedRelated(
+    selected,
+    ref.read(mediaSearchRepositoryProvider),
+    ref.read(isarServiceProvider),
+  );
 }
