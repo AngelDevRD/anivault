@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:anivault/features/library/data/models/media_entry.dart';
 import 'package:anivault/features/library/domain/enums.dart';
+import 'package:anivault/features/library/domain/franchise_group.dart';
 import 'package:anivault/shared/widgets/media_cover.dart';
 
 /// Color asociado a cada estado de seguimiento.
@@ -16,16 +16,20 @@ Color statusColor(BuildContext context, MediaStatus status) {
   };
 }
 
-/// Tarjeta de una obra en la lista de biblioteca.
+/// Tarjeta de una obra (o franquicia completa) en la lista de biblioteca.
+/// Muestra los datos de la obra principal ([FranchiseGroup.root]); si el
+/// grupo tiene más miembros (temporadas, películas, OVAs...) se ve un
+/// badge con el total.
 class MediaCard extends StatelessWidget {
-  const MediaCard({super.key, required this.entry, required this.onTap});
+  const MediaCard({super.key, required this.group, required this.onTap});
 
-  final MediaEntry entry;
+  final FranchiseGroup group;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final entry = group.root;
     final total = entry.totalUnits;
     final unitLabel = entry.type == MediaType.anime ? 'ep' : 'cap';
 
@@ -56,6 +60,26 @@ class MediaCard extends StatelessWidget {
                             ),
                           ),
                         ),
+                        if (group.isFranchise)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 6),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.secondaryContainer,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                '${group.members.length} obras',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: theme.colorScheme.onSecondaryContainer,
+                                ),
+                              ),
+                            ),
+                          ),
                         if (entry.favorite)
                           const Icon(
                             Icons.favorite,

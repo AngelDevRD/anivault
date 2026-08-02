@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:anivault/core/providers.dart';
 import 'package:anivault/features/library/data/models/media_entry.dart';
 import 'package:anivault/features/library/domain/enums.dart';
+import 'package:anivault/features/library/domain/franchise_group.dart';
 
 /// Señal reactiva: emite cada vez que cambia la colección de obras en Isar.
 /// Permite a las listas refrescarse automáticamente tras agregar/editar/borrar.
@@ -76,6 +77,15 @@ final libraryListProvider = FutureProvider.family<List<MediaEntry>, MediaType>((
     limit: 500,
   );
 });
+
+/// Igual que [libraryListProvider], pero agrupando por franquicia: una
+/// misma obra principal, sus temporadas, películas, OVAs, etc. aparecen
+/// como un único elemento en la biblioteca.
+final libraryGroupedListProvider =
+    FutureProvider.family<List<FranchiseGroup>, MediaType>((ref, type) async {
+      final flat = await ref.watch(libraryListProvider(type).future);
+      return groupByFranchise(flat);
+    });
 
 /// Conteo total por tipo (para badges de las pestañas).
 final libraryCountProvider = FutureProvider.family<int, MediaType>((

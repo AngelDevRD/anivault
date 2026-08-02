@@ -82,6 +82,20 @@ class MediaEntry {
   /// `false` tras un push exitoso.
   bool dirty = true;
 
+  // --- Agrupación por franquicia (ver core/franchise) ---
+
+  /// Id compartido por todas las entradas de una misma franquicia (misma
+  /// serie base, temporadas, películas, OVAs...). `null` = obra sin
+  /// franquicia detectada (se muestra como obra independiente).
+  @Index()
+  String? franchiseId;
+
+  /// Tipo de relación (tal cual la reporta AniList: SEQUEL, PREQUEL,
+  /// SIDE_STORY, SPIN_OFF, ALTERNATIVE, ADAPTATION...) hacia la obra de la
+  /// franquicia con la que se vinculó esta entrada al agregarla. `null` en
+  /// la obra que originó la franquicia (o en obras sin franquicia).
+  String? relationToRoot;
+
   MediaEntry({
     this.type = MediaType.anime,
     this.status = MediaStatus.pending,

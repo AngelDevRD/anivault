@@ -1,5 +1,6 @@
 import 'package:anivault/features/add_media/data/media_search_repository.dart';
 import 'package:anivault/features/add_media/domain/media_suggestion.dart';
+import 'package:anivault/features/library/data/franchise_linker.dart';
 import 'package:anivault/features/library/domain/enums.dart';
 import 'package:anivault/services/isar_service.dart';
 
@@ -69,8 +70,9 @@ Future<TitleListImportResult> importTitleList({
         if (existing != null) {
           duplicated++;
         } else {
-          final entry = await repo.fetchDetail(top);
-          await isar.upsert(entry);
+          final result = await repo.fetchDetail(top);
+          await linkFranchise(result.entry, result.relations, isar);
+          await isar.upsert(result.entry);
           added++;
         }
       }

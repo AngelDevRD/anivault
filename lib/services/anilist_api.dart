@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import 'package:anivault/features/add_media/domain/media_relation.dart';
 import 'package:anivault/features/add_media/domain/media_suggestion.dart';
 import 'package:anivault/features/library/data/models/media_entry.dart';
 import 'package:anivault/features/library/domain/enums.dart';
@@ -53,6 +54,12 @@ class AniListApi {
         startDate { year }
         studios(isMain: true) { nodes { name } }
         staff(perPage: 1) { edges { role node { name { full } } } }
+        relations {
+          edges {
+            relationType(version: 2)
+            node { id }
+          }
+        }
       }
     }
   ''';
@@ -74,8 +81,10 @@ class AniListApi {
   }
 
   /// Descarga el detalle completo y lo mapea a un [MediaEntry] nuevo
-  /// (estado inicial: pendiente).
-  Future<MediaEntry> fetchDetail({
+  /// (estado inicial: pendiente), junto con sus relaciones directas
+  /// (secuela, precuela, película, side story...) para que
+  /// `linkFranchise` decida si pertenece a una franquicia ya agregada.
+  Future<({MediaEntry entry, List<MediaRelation> relations})> fetchDetail({
     required int id,
     required MediaType requestedType,
   }) async {
@@ -84,7 +93,21 @@ class AniListApi {
     if (m == null) {
       throw Exception('AniList: obra $id no encontrada');
     }
-    return _toEntry(m, requestedType);
+    return (entry: _toEntry(m, requestedType), relations: _parseRelations(m));
+  }
+
+  static List<MediaRelation> _parseRelations(Map<String, dynamic> m) {
+    final edges = (m['relations']?['edges'] as List?) ?? const [];
+    return edges
+        .cast<Map<String, dynamic>>()
+        .map((e) {
+          final nodeId = e['node']?['id'] as int?;
+          final relationType = e['relationType'] as String?;
+          if (nodeId == null || relationType == null) return null;
+          return MediaRelation(anilistId: nodeId, relationType: relationType);
+        })
+        .whereType<MediaRelation>()
+        .toList();
   }
 
   // --- Internos ---

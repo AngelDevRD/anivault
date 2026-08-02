@@ -7,6 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:anivault/core/providers.dart';
 import 'package:anivault/features/add_media/domain/media_suggestion.dart';
 import 'package:anivault/features/add_media/presentation/add_providers.dart';
+import 'package:anivault/features/library/data/franchise_linker.dart';
 import 'package:anivault/features/library/domain/enums.dart';
 import 'package:anivault/shared/widgets/empty_state.dart';
 import 'package:anivault/shared/widgets/media_cover.dart';
@@ -55,10 +56,11 @@ class AddMediaPage extends HookConsumerWidget {
           saving.value = null;
           return;
         }
-        final entry = await repo.fetchDetail(s);
-        await isar.upsert(entry);
+        final result = await repo.fetchDetail(s);
+        await linkFranchise(result.entry, result.relations, isar);
+        await isar.upsert(result.entry);
         messenger.showSnackBar(
-          SnackBar(content: Text('Agregado: ${entry.title}')),
+          SnackBar(content: Text('Agregado: ${result.entry.title}')),
         );
         navigator.pop();
       } catch (e) {

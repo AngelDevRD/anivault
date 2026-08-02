@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:anivault/core/providers.dart';
 import 'package:anivault/features/add_media/domain/media_suggestion.dart';
+import 'package:anivault/features/library/data/franchise_linker.dart';
 import 'package:anivault/features/library/data/models/media_entry.dart';
 import 'package:anivault/features/library/domain/enums.dart';
 import 'package:anivault/shared/widgets/media_cover.dart';
@@ -49,8 +50,9 @@ class ImportReviewPage extends HookConsumerWidget {
           ? await isar.findByAnilistId(int.parse(picked.sourceId), type)
           : null;
       if (existing == null) {
-        final entry = await repo.fetchDetail(picked);
-        await isar.upsert(entry);
+        final result = await repo.fetchDetail(picked);
+        await linkFranchise(result.entry, result.relations, isar);
+        await isar.upsert(result.entry);
       }
       resolved.value = {...resolved.value, title};
     }

@@ -1,3 +1,4 @@
+import 'package:anivault/features/add_media/domain/media_relation.dart';
 import 'package:anivault/features/add_media/domain/media_suggestion.dart';
 import 'package:anivault/features/library/data/models/media_entry.dart';
 import 'package:anivault/features/library/domain/enums.dart';
@@ -42,21 +43,30 @@ class MediaSearchRepository {
     }
   }
 
-  /// Descarga el detalle completo de la sugerencia seleccionada.
-  Future<MediaEntry> fetchDetail(MediaSuggestion s) {
-    return switch (s.source) {
-      MediaSource.anilist => _anilist.fetchDetail(
-        id: int.parse(s.sourceId),
-        requestedType: s.type,
-      ),
-      MediaSource.jikan => _jikan.fetchDetail(
-        malId: int.parse(s.sourceId),
-        requestedType: s.type,
-      ),
-      MediaSource.mangadex => _mangadex.fetchDetail(
-        id: s.sourceId,
-        requestedType: s.type,
-      ),
-    };
+  /// Descarga el detalle completo de la sugerencia seleccionada, junto con
+  /// sus relaciones directas si la fuente es AniList (única con un grafo
+  /// de relaciones estructurado; Jikan/MangaDex devuelven relations: []).
+  Future<({MediaEntry entry, List<MediaRelation> relations})> fetchDetail(
+    MediaSuggestion s,
+  ) async {
+    switch (s.source) {
+      case MediaSource.anilist:
+        return _anilist.fetchDetail(
+          id: int.parse(s.sourceId),
+          requestedType: s.type,
+        );
+      case MediaSource.jikan:
+        final entry = await _jikan.fetchDetail(
+          malId: int.parse(s.sourceId),
+          requestedType: s.type,
+        );
+        return (entry: entry, relations: const <MediaRelation>[]);
+      case MediaSource.mangadex:
+        final entry = await _mangadex.fetchDetail(
+          id: s.sourceId,
+          requestedType: s.type,
+        );
+        return (entry: entry, relations: const <MediaRelation>[]);
+    }
   }
 }
