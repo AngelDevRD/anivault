@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:anivault/core/providers.dart';
+import 'package:anivault/features/add_media/domain/franchise_suggestions.dart';
 import 'package:anivault/features/add_media/domain/media_suggestion.dart';
 import 'package:anivault/features/library/data/franchise_linker.dart';
 import 'package:anivault/features/library/data/models/media_entry.dart';
@@ -52,6 +53,10 @@ class ImportReviewPage extends HookConsumerWidget {
       if (existing == null) {
         final result = await repo.fetchDetail(picked);
         await linkFranchise(result.entry, result.relations, isar);
+        result.entry.hasUnaddedRelations = (await findMissingRelated(
+          result.relations,
+          isar,
+        )).isNotEmpty;
         await isar.upsert(result.entry);
       }
       resolved.value = {...resolved.value, title};

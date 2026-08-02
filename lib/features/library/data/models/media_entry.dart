@@ -96,6 +96,13 @@ class MediaEntry {
   /// la obra que originó la franquicia (o en obras sin franquicia).
   String? relationToRoot;
 
+  /// `true` si, la última vez que se revisó, AniList reportaba relaciones
+  /// (secuelas/películas/OVAs/etc.) que todavía no están en la biblioteca.
+  /// Es solo una pista para mostrar un aviso — "Buscar más contenido"
+  /// siempre vuelve a verificar en el momento, así que no hace falta que
+  /// esté perfectamente actualizado.
+  bool hasUnaddedRelations = false;
+
   MediaEntry({
     this.type = MediaType.anime,
     this.status = MediaStatus.pending,

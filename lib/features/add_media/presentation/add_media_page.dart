@@ -11,6 +11,7 @@ import 'package:anivault/features/add_media/domain/media_suggestion.dart';
 import 'package:anivault/features/add_media/presentation/add_providers.dart';
 import 'package:anivault/features/add_media/presentation/related_suggestions_sheet.dart';
 import 'package:anivault/features/library/data/franchise_linker.dart';
+import 'package:anivault/features/library/data/models/media_entry.dart';
 import 'package:anivault/features/library/domain/enums.dart';
 import 'package:anivault/shared/widgets/empty_state.dart';
 import 'package:anivault/shared/widgets/media_cover.dart';
@@ -61,14 +62,15 @@ class AddMediaPage extends HookConsumerWidget {
         }
         final result = await repo.fetchDetail(s);
         await linkFranchise(result.entry, result.relations, isar);
+        final missing = await findMissingRelated(result.relations, isar);
+        result.entry.hasUnaddedRelations = missing.isNotEmpty;
         await isar.upsert(result.entry);
         messenger.showSnackBar(
           SnackBar(content: Text('Agregado: ${result.entry.title}')),
         );
 
-        final missing = await findMissingRelated(result.relations, isar);
         if (missing.isNotEmpty && context.mounted) {
-          await _offerRelated(context, ref, missing);
+          await _offerRelated(context, ref, result.entry, missing);
         }
         navigator.pop();
       } catch (e) {
@@ -172,6 +174,7 @@ class AddMediaPage extends HookConsumerWidget {
 Future<void> _offerRelated(
   BuildContext context,
   WidgetRef ref,
+  MediaEntry addedEntry,
   List<MediaRelation> missing,
 ) async {
   final selected = await showModalBottomSheet<List<MediaRelation>>(
@@ -181,9 +184,10 @@ Future<void> _offerRelated(
   );
   if (selected == null || selected.isEmpty) return;
 
-  await addSelectedRelated(
-    selected,
-    ref.read(mediaSearchRepositoryProvider),
-    ref.read(isarServiceProvider),
-  );
+  final isar = ref.read(isarServiceProvider);
+  await addSelectedRelated(selected, ref.read(mediaSearchRepositoryProvider), isar);
+
+  final stillMissing = missing.where((r) => !selected.contains(r));
+  addedEntry.hasUnaddedRelations = stillMissing.isNotEmpty;
+  await isar.upsert(addedEntry);
 }

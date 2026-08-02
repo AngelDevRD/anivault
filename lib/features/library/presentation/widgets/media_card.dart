@@ -21,10 +21,20 @@ Color statusColor(BuildContext context, MediaStatus status) {
 /// grupo tiene más miembros (temporadas, películas, OVAs...) se ve un
 /// badge con el total.
 class MediaCard extends StatelessWidget {
-  const MediaCard({super.key, required this.group, required this.onTap});
+  const MediaCard({
+    super.key,
+    required this.group,
+    required this.onTap,
+    this.onDiscoverTap,
+  });
 
   final FranchiseGroup group;
   final VoidCallback onTap;
+
+  /// Si no es `null`, se muestra un aviso de "contenido nuevo disponible"
+  /// (ver `MediaEntry.hasUnaddedRelations`) que al tocarlo llama esto en
+  /// vez de abrir la ficha/franquicia.
+  final VoidCallback? onDiscoverTap;
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +86,22 @@ class MediaCard extends StatelessWidget {
                                 '${group.members.length} obras',
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   color: theme.colorScheme.onSecondaryContainer,
+                                ),
+                              ),
+                            ),
+                          ),
+                        if (onDiscoverTap != null)
+                          Tooltip(
+                            message: 'Hay obras relacionadas nuevas',
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(12),
+                              onTap: onDiscoverTap,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2),
+                                child: Icon(
+                                  Icons.fiber_new,
+                                  size: 20,
+                                  color: theme.colorScheme.primary,
                                 ),
                               ),
                             ),

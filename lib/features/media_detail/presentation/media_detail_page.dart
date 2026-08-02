@@ -4,10 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:anivault/core/providers.dart';
-import 'package:anivault/features/add_media/domain/franchise_suggestions.dart';
-import 'package:anivault/features/add_media/domain/media_relation.dart';
-import 'package:anivault/features/add_media/domain/media_suggestion.dart';
-import 'package:anivault/features/add_media/presentation/related_suggestions_sheet.dart';
+import 'package:anivault/features/add_media/presentation/related_suggestions_flow.dart';
 import 'package:anivault/features/library/data/models/media_entry.dart';
 import 'package:anivault/features/library/domain/enums.dart';
 import 'package:anivault/features/library/presentation/widgets/media_card.dart';
@@ -55,42 +52,6 @@ class _DetailBody extends HookConsumerWidget {
   void _touch(ValueNotifier<int> tick, WidgetRef ref) {
     tick.value++;
     _save(ref);
-  }
-
-  Future<void> _searchRelated(BuildContext context, WidgetRef ref) async {
-    final anilistId = entry.anilistId;
-    if (anilistId == null) return;
-    final messenger = ScaffoldMessenger.of(context);
-    try {
-      final repo = ref.read(mediaSearchRepositoryProvider);
-      final isar = ref.read(isarServiceProvider);
-      final result = await repo.fetchDetail(
-        MediaSuggestion(
-          source: MediaSource.anilist,
-          sourceId: anilistId.toString(),
-          type: entry.type,
-          title: entry.title,
-        ),
-      );
-      final missing = await findMissingRelated(result.relations, isar);
-      if (!context.mounted) return;
-      if (missing.isEmpty) {
-        messenger.showSnackBar(
-          const SnackBar(content: Text('No hay obras nuevas relacionadas')),
-        );
-        return;
-      }
-      final selected = await showModalBottomSheet<List<MediaRelation>>(
-        context: context,
-        isScrollControlled: true,
-        builder: (_) => RelatedSuggestionsSheet(relations: missing),
-      );
-      if (selected == null || selected.isEmpty) return;
-      final added = await addSelectedRelated(selected, repo, isar);
-      messenger.showSnackBar(SnackBar(content: Text('$added obras agregadas')));
-    } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('Error: $e')));
-    }
   }
 
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
@@ -417,7 +378,7 @@ class _DetailBody extends HookConsumerWidget {
                   OutlinedButton.icon(
                     icon: const Icon(Icons.travel_explore),
                     label: const Text('Buscar más contenido'),
-                    onPressed: () => _searchRelated(context, ref),
+                    onPressed: () => searchAndOfferRelated(context, ref, entry),
                   ),
                 ],
                 const SizedBox(height: 32),

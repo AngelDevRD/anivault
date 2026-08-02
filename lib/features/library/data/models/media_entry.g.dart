@@ -80,84 +80,89 @@ const MediaEntrySchema = CollectionSchema(
       name: r'genres',
       type: IsarType.stringList,
     ),
-    r'lastUpdatedDate': PropertySchema(
+    r'hasUnaddedRelations': PropertySchema(
       id: 15,
+      name: r'hasUnaddedRelations',
+      type: IsarType.bool,
+    ),
+    r'lastUpdatedDate': PropertySchema(
+      id: 16,
       name: r'lastUpdatedDate',
       type: IsarType.dateTime,
     ),
-    r'malId': PropertySchema(id: 16, name: r'malId', type: IsarType.long),
-    r'notes': PropertySchema(id: 17, name: r'notes', type: IsarType.string),
+    r'malId': PropertySchema(id: 17, name: r'malId', type: IsarType.long),
+    r'notes': PropertySchema(id: 18, name: r'notes', type: IsarType.string),
     r'publisher': PropertySchema(
-      id: 18,
+      id: 19,
       name: r'publisher',
       type: IsarType.string,
     ),
     r'relationToRoot': PropertySchema(
-      id: 19,
+      id: 20,
       name: r'relationToRoot',
       type: IsarType.string,
     ),
     r'releaseStatus': PropertySchema(
-      id: 20,
+      id: 21,
       name: r'releaseStatus',
       type: IsarType.string,
     ),
     r'startDate': PropertySchema(
-      id: 21,
+      id: 22,
       name: r'startDate',
       type: IsarType.dateTime,
     ),
     r'status': PropertySchema(
-      id: 22,
+      id: 23,
       name: r'status',
       type: IsarType.byte,
       enumMap: _MediaEntrystatusEnumValueMap,
     ),
-    r'studio': PropertySchema(id: 23, name: r'studio', type: IsarType.string),
+    r'studio': PropertySchema(id: 24, name: r'studio', type: IsarType.string),
     r'synopsis': PropertySchema(
-      id: 24,
+      id: 25,
       name: r'synopsis',
       type: IsarType.string,
     ),
-    r'title': PropertySchema(id: 25, name: r'title', type: IsarType.string),
+    r'title': PropertySchema(id: 26, name: r'title', type: IsarType.string),
     r'titleEnglish': PropertySchema(
-      id: 26,
+      id: 27,
       name: r'titleEnglish',
       type: IsarType.string,
     ),
     r'titleOriginal': PropertySchema(
-      id: 27,
+      id: 28,
       name: r'titleOriginal',
       type: IsarType.string,
     ),
     r'totalChapters': PropertySchema(
-      id: 28,
+      id: 29,
       name: r'totalChapters',
       type: IsarType.long,
     ),
     r'totalEpisodes': PropertySchema(
-      id: 29,
+      id: 30,
       name: r'totalEpisodes',
       type: IsarType.long,
     ),
     r'totalVolumes': PropertySchema(
-      id: 30,
+      id: 31,
       name: r'totalVolumes',
       type: IsarType.long,
     ),
     r'type': PropertySchema(
-      id: 31,
+      id: 32,
       name: r'type',
       type: IsarType.byte,
       enumMap: _MediaEntrytypeEnumValueMap,
     ),
     r'userRating': PropertySchema(
-      id: 32,
+      id: 33,
       name: r'userRating',
       type: IsarType.double,
     ),
-    r'uuid': PropertySchema(id: 33, name: r'uuid', type: IsarType.string),
-    r'year': PropertySchema(id: 34, name: r'year', type: IsarType.long),
+    r'uuid': PropertySchema(id: 34, name: r'uuid', type: IsarType.string),
+    r'year': PropertySchema(id: 35, name: r'year', type: IsarType.long),
   },
 
   estimateSize: _mediaEntryEstimateSize,
@@ -358,26 +363,27 @@ void _mediaEntrySerialize(
   writer.writeString(offsets[12], object.format);
   writer.writeString(offsets[13], object.franchiseId);
   writer.writeStringList(offsets[14], object.genres);
-  writer.writeDateTime(offsets[15], object.lastUpdatedDate);
-  writer.writeLong(offsets[16], object.malId);
-  writer.writeString(offsets[17], object.notes);
-  writer.writeString(offsets[18], object.publisher);
-  writer.writeString(offsets[19], object.relationToRoot);
-  writer.writeString(offsets[20], object.releaseStatus);
-  writer.writeDateTime(offsets[21], object.startDate);
-  writer.writeByte(offsets[22], object.status.index);
-  writer.writeString(offsets[23], object.studio);
-  writer.writeString(offsets[24], object.synopsis);
-  writer.writeString(offsets[25], object.title);
-  writer.writeString(offsets[26], object.titleEnglish);
-  writer.writeString(offsets[27], object.titleOriginal);
-  writer.writeLong(offsets[28], object.totalChapters);
-  writer.writeLong(offsets[29], object.totalEpisodes);
-  writer.writeLong(offsets[30], object.totalVolumes);
-  writer.writeByte(offsets[31], object.type.index);
-  writer.writeDouble(offsets[32], object.userRating);
-  writer.writeString(offsets[33], object.uuid);
-  writer.writeLong(offsets[34], object.year);
+  writer.writeBool(offsets[15], object.hasUnaddedRelations);
+  writer.writeDateTime(offsets[16], object.lastUpdatedDate);
+  writer.writeLong(offsets[17], object.malId);
+  writer.writeString(offsets[18], object.notes);
+  writer.writeString(offsets[19], object.publisher);
+  writer.writeString(offsets[20], object.relationToRoot);
+  writer.writeString(offsets[21], object.releaseStatus);
+  writer.writeDateTime(offsets[22], object.startDate);
+  writer.writeByte(offsets[23], object.status.index);
+  writer.writeString(offsets[24], object.studio);
+  writer.writeString(offsets[25], object.synopsis);
+  writer.writeString(offsets[26], object.title);
+  writer.writeString(offsets[27], object.titleEnglish);
+  writer.writeString(offsets[28], object.titleOriginal);
+  writer.writeLong(offsets[29], object.totalChapters);
+  writer.writeLong(offsets[30], object.totalEpisodes);
+  writer.writeLong(offsets[31], object.totalVolumes);
+  writer.writeByte(offsets[32], object.type.index);
+  writer.writeDouble(offsets[33], object.userRating);
+  writer.writeString(offsets[34], object.uuid);
+  writer.writeLong(offsets[35], object.year);
 }
 
 MediaEntry _mediaEntryDeserialize(
@@ -399,35 +405,36 @@ MediaEntry _mediaEntryDeserialize(
     favorite: reader.readBoolOrNull(offsets[11]) ?? false,
     format: reader.readStringOrNull(offsets[12]),
     genres: reader.readStringList(offsets[14]) ?? const [],
-    lastUpdatedDate: reader.readDateTimeOrNull(offsets[15]),
-    malId: reader.readLongOrNull(offsets[16]),
-    notes: reader.readStringOrNull(offsets[17]),
-    publisher: reader.readStringOrNull(offsets[18]),
-    releaseStatus: reader.readStringOrNull(offsets[20]),
-    startDate: reader.readDateTimeOrNull(offsets[21]),
+    lastUpdatedDate: reader.readDateTimeOrNull(offsets[16]),
+    malId: reader.readLongOrNull(offsets[17]),
+    notes: reader.readStringOrNull(offsets[18]),
+    publisher: reader.readStringOrNull(offsets[19]),
+    releaseStatus: reader.readStringOrNull(offsets[21]),
+    startDate: reader.readDateTimeOrNull(offsets[22]),
     status:
-        _MediaEntrystatusValueEnumMap[reader.readByteOrNull(offsets[22])] ??
+        _MediaEntrystatusValueEnumMap[reader.readByteOrNull(offsets[23])] ??
         MediaStatus.pending,
-    studio: reader.readStringOrNull(offsets[23]),
-    synopsis: reader.readStringOrNull(offsets[24]),
-    title: reader.readStringOrNull(offsets[25]) ?? '',
-    titleEnglish: reader.readStringOrNull(offsets[26]),
-    titleOriginal: reader.readStringOrNull(offsets[27]),
-    totalChapters: reader.readLongOrNull(offsets[28]),
-    totalEpisodes: reader.readLongOrNull(offsets[29]),
-    totalVolumes: reader.readLongOrNull(offsets[30]),
+    studio: reader.readStringOrNull(offsets[24]),
+    synopsis: reader.readStringOrNull(offsets[25]),
+    title: reader.readStringOrNull(offsets[26]) ?? '',
+    titleEnglish: reader.readStringOrNull(offsets[27]),
+    titleOriginal: reader.readStringOrNull(offsets[28]),
+    totalChapters: reader.readLongOrNull(offsets[29]),
+    totalEpisodes: reader.readLongOrNull(offsets[30]),
+    totalVolumes: reader.readLongOrNull(offsets[31]),
     type:
-        _MediaEntrytypeValueEnumMap[reader.readByteOrNull(offsets[31])] ??
+        _MediaEntrytypeValueEnumMap[reader.readByteOrNull(offsets[32])] ??
         MediaType.anime,
-    userRating: reader.readDoubleOrNull(offsets[32]),
-    year: reader.readLongOrNull(offsets[34]),
+    userRating: reader.readDoubleOrNull(offsets[33]),
+    year: reader.readLongOrNull(offsets[35]),
   );
   object.addedDate = reader.readDateTime(offsets[0]);
   object.dirty = reader.readBool(offsets[9]);
   object.franchiseId = reader.readStringOrNull(offsets[13]);
+  object.hasUnaddedRelations = reader.readBool(offsets[15]);
   object.id = id;
-  object.relationToRoot = reader.readStringOrNull(offsets[19]);
-  object.uuid = reader.readString(offsets[33]);
+  object.relationToRoot = reader.readStringOrNull(offsets[20]);
+  object.uuid = reader.readString(offsets[34]);
   return object;
 }
 
@@ -469,11 +476,11 @@ P _mediaEntryDeserializeProp<P>(
     case 14:
       return (reader.readStringList(offset) ?? const []) as P;
     case 15:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 16:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 17:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 18:
       return (reader.readStringOrNull(offset)) as P;
     case 19:
@@ -481,36 +488,38 @@ P _mediaEntryDeserializeProp<P>(
     case 20:
       return (reader.readStringOrNull(offset)) as P;
     case 21:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 22:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 23:
       return (_MediaEntrystatusValueEnumMap[reader.readByteOrNull(offset)] ??
               MediaStatus.pending)
           as P;
-    case 23:
-      return (reader.readStringOrNull(offset)) as P;
     case 24:
       return (reader.readStringOrNull(offset)) as P;
     case 25:
-      return (reader.readStringOrNull(offset) ?? '') as P;
-    case 26:
       return (reader.readStringOrNull(offset)) as P;
+    case 26:
+      return (reader.readStringOrNull(offset) ?? '') as P;
     case 27:
       return (reader.readStringOrNull(offset)) as P;
     case 28:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 29:
       return (reader.readLongOrNull(offset)) as P;
     case 30:
       return (reader.readLongOrNull(offset)) as P;
     case 31:
+      return (reader.readLongOrNull(offset)) as P;
+    case 32:
       return (_MediaEntrytypeValueEnumMap[reader.readByteOrNull(offset)] ??
               MediaType.anime)
           as P;
-    case 32:
-      return (reader.readDoubleOrNull(offset)) as P;
     case 33:
-      return (reader.readString(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 34:
+      return (reader.readString(offset)) as P;
+    case 35:
       return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -2663,6 +2672,15 @@ extension MediaEntryQueryFilter
         includeLower,
         upper,
         includeUpper,
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition>
+  hasUnaddedRelationsEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'hasUnaddedRelations', value: value),
       );
     });
   }
@@ -5221,6 +5239,20 @@ extension MediaEntryQuerySortBy
     });
   }
 
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy>
+  sortByHasUnaddedRelations() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hasUnaddedRelations', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy>
+  sortByHasUnaddedRelationsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hasUnaddedRelations', Sort.desc);
+    });
+  }
+
   QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> sortByLastUpdatedDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastUpdatedDate', Sort.asc);
@@ -5638,6 +5670,20 @@ extension MediaEntryQuerySortThenBy
     });
   }
 
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy>
+  thenByHasUnaddedRelations() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hasUnaddedRelations', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy>
+  thenByHasUnaddedRelationsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hasUnaddedRelations', Sort.desc);
+    });
+  }
+
   QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -5998,6 +6044,13 @@ extension MediaEntryQueryWhereDistinct
     });
   }
 
+  QueryBuilder<MediaEntry, MediaEntry, QDistinct>
+  distinctByHasUnaddedRelations() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'hasUnaddedRelations');
+    });
+  }
+
   QueryBuilder<MediaEntry, MediaEntry, QDistinct> distinctByLastUpdatedDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'lastUpdatedDate');
@@ -6244,6 +6297,13 @@ extension MediaEntryQueryProperty
   QueryBuilder<MediaEntry, List<String>, QQueryOperations> genresProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'genres');
+    });
+  }
+
+  QueryBuilder<MediaEntry, bool, QQueryOperations>
+  hasUnaddedRelationsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'hasUnaddedRelations');
     });
   }
 

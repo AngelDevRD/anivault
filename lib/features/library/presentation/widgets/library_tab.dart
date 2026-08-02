@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:anivault/features/add_media/presentation/related_suggestions_flow.dart';
+import 'package:anivault/features/library/data/models/media_entry.dart';
 import 'package:anivault/features/library/domain/enums.dart';
 import 'package:anivault/features/library/domain/franchise_group.dart';
 import 'package:anivault/features/library/presentation/library_providers.dart';
@@ -55,11 +57,25 @@ class LibraryTab extends ConsumerWidget {
                 itemCount: items.length,
                 itemBuilder: (_, i) {
                   final group = items[i];
+                  MediaEntry? discoverEntry;
+                  for (final e in group.members) {
+                    if (e.hasUnaddedRelations) {
+                      discoverEntry = e;
+                      break;
+                    }
+                  }
                   return MediaCard(
                     group: group,
                     onTap: () => group.isFranchise
                         ? _showFranchiseSheet(context, group)
                         : context.push('/detail/${group.root.id}'),
+                    onDiscoverTap: discoverEntry == null
+                        ? null
+                        : () => searchAndOfferRelated(
+                            context,
+                            ref,
+                            discoverEntry!,
+                          ),
                   );
                 },
               );
