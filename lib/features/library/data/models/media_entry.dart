@@ -103,6 +103,15 @@ class MediaEntry {
   /// esté perfectamente actualizado.
   bool hasUnaddedRelations = false;
 
+  // --- Sincronización de contenido con AniList (ver core/sync) ---
+
+  /// Última vez que se refrescaron los datos de esta obra desde AniList.
+  DateTime? lastSyncedAt;
+
+  /// `updatedAt` de AniList tal cual lo reportó la última vez. Permite
+  /// saber si cambió sin comparar campo por campo.
+  int? remoteUpdatedAt;
+
   MediaEntry({
     this.type = MediaType.anime,
     this.status = MediaStatus.pending,

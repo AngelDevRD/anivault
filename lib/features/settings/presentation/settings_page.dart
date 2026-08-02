@@ -103,6 +103,14 @@ class SettingsPage extends HookConsumerWidget {
             subtitle: const Text('Backup completo en JSON'),
             onTap: () => _exportLibrary(context, ref),
           ),
+          ListTile(
+            leading: const Icon(Icons.sync),
+            title: const Text('Sincronizar biblioteca'),
+            subtitle: const Text(
+              'Actualiza episodios, estado de emisión y portadas desde AniList',
+            ),
+            onTap: () => _syncLibrary(context, ref),
+          ),
           const ListTile(
             leading: Icon(Icons.notifications_outlined),
             title: Text('Notificaciones'),
@@ -112,7 +120,7 @@ class SettingsPage extends HookConsumerWidget {
           const SizedBox(height: 12),
           Center(
             child: Text(
-              'AniVault · v1.0.0',
+              'AniVault · v1.2.0',
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
@@ -212,6 +220,25 @@ Future<void> _exportLibrary(BuildContext context, WidgetRef ref) async {
     );
   } catch (e) {
     messenger.showSnackBar(SnackBar(content: Text('No se pudo exportar: $e')));
+  }
+}
+
+Future<void> _syncLibrary(BuildContext context, WidgetRef ref) async {
+  final messenger = ScaffoldMessenger.of(context);
+  messenger.showSnackBar(
+    const SnackBar(content: Text('Sincronizando biblioteca...')),
+  );
+  try {
+    final result = await ref.read(contentSyncServiceProvider).syncAll();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          '${result.updated} de ${result.checked} obras actualizadas',
+        ),
+      ),
+    );
+  } catch (e) {
+    messenger.showSnackBar(SnackBar(content: Text('No se pudo sincronizar: $e')));
   }
 }
 

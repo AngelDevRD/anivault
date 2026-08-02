@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import 'package:anivault/core/sync/remote_media_snapshot.dart';
 import 'package:anivault/features/add_media/domain/media_relation.dart';
 import 'package:anivault/features/add_media/domain/media_suggestion.dart';
 import 'package:anivault/features/library/data/models/media_entry.dart';
@@ -132,6 +133,42 @@ class AniListApi {
         })
         .whereType<MediaRelation>()
         .toList();
+  }
+
+  static const _bulkSnapshotQuery = r'''
+    query ($ids: [Int]) {
+      Page(perPage: 50) {
+        media(id_in: $ids) {
+          id
+          updatedAt
+          episodes
+          chapters
+          status
+          coverImage { large }
+          genres
+        }
+      }
+    }
+  ''';
+
+  /// Trae el estado actual de hasta 50 obras en una sola consulta (para
+  /// `ContentSyncService`, evita una llamada por obra). El llamador debe
+  /// dividir listas más grandes en lotes de 50.
+  Future<List<RemoteMediaSnapshot>> fetchBulkSnapshot(List<int> ids) async {
+    if (ids.isEmpty) return const [];
+    final res = await _post(_bulkSnapshotQuery, {'ids': ids});
+    final media = (res['data']?['Page']?['media'] as List?) ?? const [];
+    return media.cast<Map<String, dynamic>>().map((m) {
+      return RemoteMediaSnapshot(
+        anilistId: m['id'] as int,
+        updatedAt: m['updatedAt'] as int?,
+        totalEpisodes: m['episodes'] as int?,
+        totalChapters: m['chapters'] as int?,
+        releaseStatus: m['status'] as String?,
+        coverImage: m['coverImage']?['large'] as String?,
+        genres: ((m['genres'] as List?) ?? const []).cast<String>(),
+      );
+    }).toList();
   }
 
   // --- Internos ---

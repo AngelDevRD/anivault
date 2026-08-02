@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -40,7 +41,7 @@ Future<void> main() async {
   );
 }
 
-class AniVaultApp extends ConsumerWidget {
+class AniVaultApp extends HookConsumerWidget {
   const AniVaultApp({super.key});
 
   @override
@@ -48,6 +49,15 @@ class AniVaultApp extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
     // Mantiene vivo el SyncEngine mientras este widget exista (toda la app).
     ref.watch(syncEngineProvider);
+
+    // Sincronización de contenido (episodios/estado/portadas desde AniList):
+    // una sola vez al abrir la app, en segundo plano, si ya pasó el
+    // intervalo configurado (ver ContentSyncService.maybeAutoSync).
+    useEffect(() {
+      ref.read(contentSyncServiceProvider).maybeAutoSync();
+      return null;
+    }, const []);
+
     return MaterialApp.router(
       title: 'AniVault',
       debugShowCheckedModeBanner: false,

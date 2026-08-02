@@ -68,6 +68,12 @@ class IsarService {
   /// Todas las obras (para el motor de estadísticas y exportación).
   Future<List<MediaEntry>> getAll() => isar.mediaEntrys.where().findAll();
 
+  /// Obras con id de AniList (candidatas a `ContentSyncService`; Jikan y
+  /// MangaDex no tienen aquí una fuente barata de "¿cambió?").
+  Future<List<MediaEntry>> getAllWithAnilistId() {
+    return isar.mediaEntrys.filter().anilistIdIsNotNull().findAll();
+  }
+
   /// Stream reactivo de todas las obras; se emite en cada cambio.
   Stream<List<MediaEntry>> watchAll() {
     return isar.mediaEntrys.where().watch(fireImmediately: true);

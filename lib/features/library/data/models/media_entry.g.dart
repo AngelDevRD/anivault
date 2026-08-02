@@ -85,84 +85,94 @@ const MediaEntrySchema = CollectionSchema(
       name: r'hasUnaddedRelations',
       type: IsarType.bool,
     ),
-    r'lastUpdatedDate': PropertySchema(
+    r'lastSyncedAt': PropertySchema(
       id: 16,
+      name: r'lastSyncedAt',
+      type: IsarType.dateTime,
+    ),
+    r'lastUpdatedDate': PropertySchema(
+      id: 17,
       name: r'lastUpdatedDate',
       type: IsarType.dateTime,
     ),
-    r'malId': PropertySchema(id: 17, name: r'malId', type: IsarType.long),
-    r'notes': PropertySchema(id: 18, name: r'notes', type: IsarType.string),
+    r'malId': PropertySchema(id: 18, name: r'malId', type: IsarType.long),
+    r'notes': PropertySchema(id: 19, name: r'notes', type: IsarType.string),
     r'publisher': PropertySchema(
-      id: 19,
+      id: 20,
       name: r'publisher',
       type: IsarType.string,
     ),
     r'relationToRoot': PropertySchema(
-      id: 20,
+      id: 21,
       name: r'relationToRoot',
       type: IsarType.string,
     ),
     r'releaseStatus': PropertySchema(
-      id: 21,
+      id: 22,
       name: r'releaseStatus',
       type: IsarType.string,
     ),
+    r'remoteUpdatedAt': PropertySchema(
+      id: 23,
+      name: r'remoteUpdatedAt',
+      type: IsarType.long,
+    ),
     r'startDate': PropertySchema(
-      id: 22,
+      id: 24,
       name: r'startDate',
       type: IsarType.dateTime,
     ),
     r'status': PropertySchema(
-      id: 23,
+      id: 25,
       name: r'status',
       type: IsarType.byte,
       enumMap: _MediaEntrystatusEnumValueMap,
     ),
-    r'studio': PropertySchema(id: 24, name: r'studio', type: IsarType.string),
+    r'studio': PropertySchema(id: 26, name: r'studio', type: IsarType.string),
     r'synopsis': PropertySchema(
-      id: 25,
+      id: 27,
       name: r'synopsis',
       type: IsarType.string,
     ),
-    r'title': PropertySchema(id: 26, name: r'title', type: IsarType.string),
+    r'title': PropertySchema(id: 28, name: r'title', type: IsarType.string),
     r'titleEnglish': PropertySchema(
-      id: 27,
+      id: 29,
       name: r'titleEnglish',
       type: IsarType.string,
     ),
     r'titleOriginal': PropertySchema(
-      id: 28,
+      id: 30,
       name: r'titleOriginal',
       type: IsarType.string,
     ),
     r'totalChapters': PropertySchema(
-      id: 29,
+      id: 31,
       name: r'totalChapters',
       type: IsarType.long,
     ),
     r'totalEpisodes': PropertySchema(
-      id: 30,
+      id: 32,
       name: r'totalEpisodes',
       type: IsarType.long,
     ),
     r'totalVolumes': PropertySchema(
-      id: 31,
+      id: 33,
       name: r'totalVolumes',
       type: IsarType.long,
     ),
     r'type': PropertySchema(
-      id: 32,
+      id: 34,
       name: r'type',
       type: IsarType.byte,
       enumMap: _MediaEntrytypeEnumValueMap,
     ),
     r'userRating': PropertySchema(
-      id: 33,
+      id: 35,
       name: r'userRating',
       type: IsarType.double,
     ),
-    r'uuid': PropertySchema(id: 34, name: r'uuid', type: IsarType.string),
-    r'year': PropertySchema(id: 35, name: r'year', type: IsarType.long),
+    r'uuid': PropertySchema(id: 36, name: r'uuid', type: IsarType.string),
+    r'year': PropertySchema(id: 37, name: r'year', type: IsarType.long),
   },
 
   estimateSize: _mediaEntryEstimateSize,
@@ -364,26 +374,28 @@ void _mediaEntrySerialize(
   writer.writeString(offsets[13], object.franchiseId);
   writer.writeStringList(offsets[14], object.genres);
   writer.writeBool(offsets[15], object.hasUnaddedRelations);
-  writer.writeDateTime(offsets[16], object.lastUpdatedDate);
-  writer.writeLong(offsets[17], object.malId);
-  writer.writeString(offsets[18], object.notes);
-  writer.writeString(offsets[19], object.publisher);
-  writer.writeString(offsets[20], object.relationToRoot);
-  writer.writeString(offsets[21], object.releaseStatus);
-  writer.writeDateTime(offsets[22], object.startDate);
-  writer.writeByte(offsets[23], object.status.index);
-  writer.writeString(offsets[24], object.studio);
-  writer.writeString(offsets[25], object.synopsis);
-  writer.writeString(offsets[26], object.title);
-  writer.writeString(offsets[27], object.titleEnglish);
-  writer.writeString(offsets[28], object.titleOriginal);
-  writer.writeLong(offsets[29], object.totalChapters);
-  writer.writeLong(offsets[30], object.totalEpisodes);
-  writer.writeLong(offsets[31], object.totalVolumes);
-  writer.writeByte(offsets[32], object.type.index);
-  writer.writeDouble(offsets[33], object.userRating);
-  writer.writeString(offsets[34], object.uuid);
-  writer.writeLong(offsets[35], object.year);
+  writer.writeDateTime(offsets[16], object.lastSyncedAt);
+  writer.writeDateTime(offsets[17], object.lastUpdatedDate);
+  writer.writeLong(offsets[18], object.malId);
+  writer.writeString(offsets[19], object.notes);
+  writer.writeString(offsets[20], object.publisher);
+  writer.writeString(offsets[21], object.relationToRoot);
+  writer.writeString(offsets[22], object.releaseStatus);
+  writer.writeLong(offsets[23], object.remoteUpdatedAt);
+  writer.writeDateTime(offsets[24], object.startDate);
+  writer.writeByte(offsets[25], object.status.index);
+  writer.writeString(offsets[26], object.studio);
+  writer.writeString(offsets[27], object.synopsis);
+  writer.writeString(offsets[28], object.title);
+  writer.writeString(offsets[29], object.titleEnglish);
+  writer.writeString(offsets[30], object.titleOriginal);
+  writer.writeLong(offsets[31], object.totalChapters);
+  writer.writeLong(offsets[32], object.totalEpisodes);
+  writer.writeLong(offsets[33], object.totalVolumes);
+  writer.writeByte(offsets[34], object.type.index);
+  writer.writeDouble(offsets[35], object.userRating);
+  writer.writeString(offsets[36], object.uuid);
+  writer.writeLong(offsets[37], object.year);
 }
 
 MediaEntry _mediaEntryDeserialize(
@@ -405,36 +417,38 @@ MediaEntry _mediaEntryDeserialize(
     favorite: reader.readBoolOrNull(offsets[11]) ?? false,
     format: reader.readStringOrNull(offsets[12]),
     genres: reader.readStringList(offsets[14]) ?? const [],
-    lastUpdatedDate: reader.readDateTimeOrNull(offsets[16]),
-    malId: reader.readLongOrNull(offsets[17]),
-    notes: reader.readStringOrNull(offsets[18]),
-    publisher: reader.readStringOrNull(offsets[19]),
-    releaseStatus: reader.readStringOrNull(offsets[21]),
-    startDate: reader.readDateTimeOrNull(offsets[22]),
+    lastUpdatedDate: reader.readDateTimeOrNull(offsets[17]),
+    malId: reader.readLongOrNull(offsets[18]),
+    notes: reader.readStringOrNull(offsets[19]),
+    publisher: reader.readStringOrNull(offsets[20]),
+    releaseStatus: reader.readStringOrNull(offsets[22]),
+    startDate: reader.readDateTimeOrNull(offsets[24]),
     status:
-        _MediaEntrystatusValueEnumMap[reader.readByteOrNull(offsets[23])] ??
+        _MediaEntrystatusValueEnumMap[reader.readByteOrNull(offsets[25])] ??
         MediaStatus.pending,
-    studio: reader.readStringOrNull(offsets[24]),
-    synopsis: reader.readStringOrNull(offsets[25]),
-    title: reader.readStringOrNull(offsets[26]) ?? '',
-    titleEnglish: reader.readStringOrNull(offsets[27]),
-    titleOriginal: reader.readStringOrNull(offsets[28]),
-    totalChapters: reader.readLongOrNull(offsets[29]),
-    totalEpisodes: reader.readLongOrNull(offsets[30]),
-    totalVolumes: reader.readLongOrNull(offsets[31]),
+    studio: reader.readStringOrNull(offsets[26]),
+    synopsis: reader.readStringOrNull(offsets[27]),
+    title: reader.readStringOrNull(offsets[28]) ?? '',
+    titleEnglish: reader.readStringOrNull(offsets[29]),
+    titleOriginal: reader.readStringOrNull(offsets[30]),
+    totalChapters: reader.readLongOrNull(offsets[31]),
+    totalEpisodes: reader.readLongOrNull(offsets[32]),
+    totalVolumes: reader.readLongOrNull(offsets[33]),
     type:
-        _MediaEntrytypeValueEnumMap[reader.readByteOrNull(offsets[32])] ??
+        _MediaEntrytypeValueEnumMap[reader.readByteOrNull(offsets[34])] ??
         MediaType.anime,
-    userRating: reader.readDoubleOrNull(offsets[33]),
-    year: reader.readLongOrNull(offsets[35]),
+    userRating: reader.readDoubleOrNull(offsets[35]),
+    year: reader.readLongOrNull(offsets[37]),
   );
   object.addedDate = reader.readDateTime(offsets[0]);
   object.dirty = reader.readBool(offsets[9]);
   object.franchiseId = reader.readStringOrNull(offsets[13]);
   object.hasUnaddedRelations = reader.readBool(offsets[15]);
   object.id = id;
-  object.relationToRoot = reader.readStringOrNull(offsets[20]);
-  object.uuid = reader.readString(offsets[34]);
+  object.lastSyncedAt = reader.readDateTimeOrNull(offsets[16]);
+  object.relationToRoot = reader.readStringOrNull(offsets[21]);
+  object.remoteUpdatedAt = reader.readLongOrNull(offsets[23]);
+  object.uuid = reader.readString(offsets[36]);
   return object;
 }
 
@@ -480,9 +494,9 @@ P _mediaEntryDeserializeProp<P>(
     case 16:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 17:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 18:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 19:
       return (reader.readStringOrNull(offset)) as P;
     case 20:
@@ -490,36 +504,40 @@ P _mediaEntryDeserializeProp<P>(
     case 21:
       return (reader.readStringOrNull(offset)) as P;
     case 22:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 23:
+      return (reader.readLongOrNull(offset)) as P;
+    case 24:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 25:
       return (_MediaEntrystatusValueEnumMap[reader.readByteOrNull(offset)] ??
               MediaStatus.pending)
           as P;
-    case 24:
-      return (reader.readStringOrNull(offset)) as P;
-    case 25:
-      return (reader.readStringOrNull(offset)) as P;
     case 26:
-      return (reader.readStringOrNull(offset) ?? '') as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 27:
       return (reader.readStringOrNull(offset)) as P;
     case 28:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset) ?? '') as P;
     case 29:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 30:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 31:
       return (reader.readLongOrNull(offset)) as P;
     case 32:
+      return (reader.readLongOrNull(offset)) as P;
+    case 33:
+      return (reader.readLongOrNull(offset)) as P;
+    case 34:
       return (_MediaEntrytypeValueEnumMap[reader.readByteOrNull(offset)] ??
               MediaType.anime)
           as P;
-    case 33:
-      return (reader.readDoubleOrNull(offset)) as P;
-    case 34:
-      return (reader.readString(offset)) as P;
     case 35:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 36:
+      return (reader.readString(offset)) as P;
+    case 37:
       return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -2745,6 +2763,79 @@ extension MediaEntryQueryFilter
   }
 
   QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition>
+  lastSyncedAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'lastSyncedAt'),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition>
+  lastSyncedAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'lastSyncedAt'),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition>
+  lastSyncedAtEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'lastSyncedAt', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition>
+  lastSyncedAtGreaterThan(DateTime? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'lastSyncedAt',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition>
+  lastSyncedAtLessThan(DateTime? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'lastSyncedAt',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition>
+  lastSyncedAtBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'lastSyncedAt',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition>
   lastUpdatedDateIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -3534,6 +3625,79 @@ extension MediaEntryQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(property: r'releaseStatus', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition>
+  remoteUpdatedAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'remoteUpdatedAt'),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition>
+  remoteUpdatedAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'remoteUpdatedAt'),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition>
+  remoteUpdatedAtEqualTo(int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'remoteUpdatedAt', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition>
+  remoteUpdatedAtGreaterThan(int? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'remoteUpdatedAt',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition>
+  remoteUpdatedAtLessThan(int? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'remoteUpdatedAt',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterFilterCondition>
+  remoteUpdatedAtBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'remoteUpdatedAt',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
       );
     });
   }
@@ -5253,6 +5417,18 @@ extension MediaEntryQuerySortBy
     });
   }
 
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> sortByLastSyncedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastSyncedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> sortByLastSyncedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastSyncedAt', Sort.desc);
+    });
+  }
+
   QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> sortByLastUpdatedDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastUpdatedDate', Sort.asc);
@@ -5324,6 +5500,19 @@ extension MediaEntryQuerySortBy
   QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> sortByReleaseStatusDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'releaseStatus', Sort.desc);
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> sortByRemoteUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'remoteUpdatedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy>
+  sortByRemoteUpdatedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'remoteUpdatedAt', Sort.desc);
     });
   }
 
@@ -5696,6 +5885,18 @@ extension MediaEntryQuerySortThenBy
     });
   }
 
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> thenByLastSyncedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastSyncedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> thenByLastSyncedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastSyncedAt', Sort.desc);
+    });
+  }
+
   QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> thenByLastUpdatedDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastUpdatedDate', Sort.asc);
@@ -5767,6 +5968,19 @@ extension MediaEntryQuerySortThenBy
   QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> thenByReleaseStatusDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'releaseStatus', Sort.desc);
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy> thenByRemoteUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'remoteUpdatedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QAfterSortBy>
+  thenByRemoteUpdatedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'remoteUpdatedAt', Sort.desc);
     });
   }
 
@@ -6051,6 +6265,12 @@ extension MediaEntryQueryWhereDistinct
     });
   }
 
+  QueryBuilder<MediaEntry, MediaEntry, QDistinct> distinctByLastSyncedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'lastSyncedAt');
+    });
+  }
+
   QueryBuilder<MediaEntry, MediaEntry, QDistinct> distinctByLastUpdatedDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'lastUpdatedDate');
@@ -6098,6 +6318,12 @@ extension MediaEntryQueryWhereDistinct
         r'releaseStatus',
         caseSensitive: caseSensitive,
       );
+    });
+  }
+
+  QueryBuilder<MediaEntry, MediaEntry, QDistinct> distinctByRemoteUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'remoteUpdatedAt');
     });
   }
 
@@ -6307,6 +6533,12 @@ extension MediaEntryQueryProperty
     });
   }
 
+  QueryBuilder<MediaEntry, DateTime?, QQueryOperations> lastSyncedAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'lastSyncedAt');
+    });
+  }
+
   QueryBuilder<MediaEntry, DateTime?, QQueryOperations>
   lastUpdatedDateProperty() {
     return QueryBuilder.apply(this, (query) {
@@ -6341,6 +6573,12 @@ extension MediaEntryQueryProperty
   QueryBuilder<MediaEntry, String?, QQueryOperations> releaseStatusProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'releaseStatus');
+    });
+  }
+
+  QueryBuilder<MediaEntry, int?, QQueryOperations> remoteUpdatedAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'remoteUpdatedAt');
     });
   }
 

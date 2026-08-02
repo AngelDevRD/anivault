@@ -23,6 +23,7 @@ class PrefsService {
   static const _kApiKey = 'ai_api_key';
   static const _kAiModel = 'ai_model';
   static const _kLanguage = 'language';
+  static const _kLastContentSyncAt = 'last_content_sync_at';
 
   static Future<PrefsService> create() async {
     final prefs = await SharedPreferences.getInstance();
@@ -64,4 +65,14 @@ class PrefsService {
 
   /// El Chat IA solo se habilita si hay clave configurada.
   bool get isAiConfigured => apiKey.trim().isNotEmpty;
+
+  /// Última vez que se sincronizó la biblioteca con AniList (episodios,
+  /// estado de emisión, etc.). `null` si nunca se sincronizó.
+  DateTime? get lastContentSyncAt {
+    final v = _prefs.getString(_kLastContentSyncAt);
+    return v == null ? null : DateTime.tryParse(v);
+  }
+
+  Future<void> setLastContentSyncAt(DateTime value) =>
+      _prefs.setString(_kLastContentSyncAt, value.toIso8601String());
 }

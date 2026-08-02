@@ -3,6 +3,23 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 Versionado según [SemVer](https://semver.org/lang/es/).
 
+## [1.2.0] - 2026-08-02
+
+### Agregado
+- Sincronización de contenido con AniList: episodios, capítulos, estado
+  de emisión, portada y géneros se refrescan sin tener que re-agregar la
+  obra. Usa el `updatedAt` de AniList para saltar obras sin cambios, y
+  agrupa las consultas en lotes de 50 (no una llamada por obra).
+- Botón "Sincronizar biblioteca" en Ajustes (sincronización manual).
+- Sincronización automática en segundo plano al abrir la app, si pasaron
+  más de 6 horas desde la última vez.
+
+### Fuera de esta versión (deliberado)
+- Aún no se refrescan relaciones/sinónimos/títulos alternativos en la
+  sincronización (solo al agregar o al usar "Buscar más contenido").
+- Solo sincroniza obras con id de AniList; Jikan/MangaDex no tienen un
+  campo `updatedAt` barato para saber "¿cambió?" sin una llamada por obra.
+
 ## [1.1.0] - 2026-08-02
 
 ### Agregado

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:anivault/core/sync/content_sync_service.dart';
 import 'package:anivault/features/add_media/data/media_search_repository.dart';
 import 'package:anivault/features/import_export/data/library_backup_service.dart';
 import 'package:anivault/services/anilist_api.dart';
@@ -52,6 +53,14 @@ final mediaSearchRepositoryProvider = Provider<MediaSearchRepository>((ref) {
 
 final libraryBackupServiceProvider = Provider<LibraryBackupService>((ref) {
   return LibraryBackupService(ref.watch(isarServiceProvider));
+});
+
+final contentSyncServiceProvider = Provider<ContentSyncService>((ref) {
+  return ContentSyncService(
+    ref.watch(aniListApiProvider),
+    ref.watch(isarServiceProvider),
+    ref.watch(prefsServiceProvider),
+  );
 });
 
 /// Modo de tema, persistido en preferencias.
