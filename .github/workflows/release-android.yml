@@ -66,6 +66,11 @@ jobs:
           VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
           echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
 
+      - name: Verificar que la version es superior a la ultima publicada
+        run: node tools/verify-release-version.mjs --repo ${{ github.repository }} --new "${{ steps.tag.outputs.tag }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
