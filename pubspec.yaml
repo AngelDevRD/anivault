@@ -44,7 +44,7 @@ dependencies:
   fl_chart: ^1.2.0
   cached_network_image: ^3.4.1
   flutter_animate: ^4.5.2
-  intl: 0.20.2
+  intl: ^0.20.3
   shared_preferences: ^2.5.5
   isar_community: ^3.3.2
   isar_community_flutter_libs: ^3.3.2
