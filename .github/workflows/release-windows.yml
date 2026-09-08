@@ -4,7 +4,8 @@ name: Release Windows
 # pago en Codemagic y por eso nunca publicaba el .zip). Este job es gratis en GitHub Actions.
 on:
   push:
-    branches: [main]
+    tags:
+      - "v*.*.*"
 
 permissions:
   contents: write
@@ -30,20 +31,13 @@ jobs:
         shell: pwsh
         run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath anivault-windows.zip
 
-      - name: Calcular tag desde pubspec.yaml
-        id: tag
-        shell: pwsh
-        run: |
-          $version = (Get-Content pubspec.yaml | Select-String '^version:').ToString() -replace 'version:\s*', '' -replace '\+.*', ''
-          echo "tag=v$($version.Trim())" >> $env:GITHUB_OUTPUT
-
-      - name: Verificar que la version es superior a la ultima publicada
-        run: node tools/verify-release-version.mjs --repo ${{ github.repository }} --new "${{ steps.tag.outputs.tag }}"
+      - name: Verificar que el tag es superior al ultimo release publicado
+        run: node tools/verify-release-version.mjs --repo ${{ github.repository }} --new "${{ github.ref_name }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.tag.outputs.tag }}
+          tag_name: ${{ github.ref_name }}
           generate_release_notes: true
           files: anivault-windows.zip
