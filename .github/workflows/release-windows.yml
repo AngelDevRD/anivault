@@ -89,21 +89,30 @@ jobs:
         shell: pwsh
         run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath anivault-windows.zip
 
-      - name: Publicar release (intento 1)
-        id: release_1
-        uses: softprops/action-gh-release@v2
-        continue-on-error: true
-        with:
-          tag_name: ${{ needs.version.outputs.tag }}
-          target_commitish: ${{ github.sha }}
-          generate_release_notes: true
-          files: anivault-windows.zip
-
-      - name: Publicar release (reintento tras carrera con release-android)
-        if: steps.release_1.outcome == 'failure'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ needs.version.outputs.tag }}
-          target_commitish: ${{ github.sha }}
-          generate_release_notes: true
-          files: anivault-windows.zip
+      # Se usa gh (Go, preinstalado en el runner) en vez de softprops/action-gh-release:
+      # con Node 24 por defecto en los runners esa accion aborta la subida de assets grandes
+      # (~50 MB) a los ~28 s con "Headers Timeout Error", dejando el release en draft y vacio.
+      - name: Publicar release con los assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft \
+              --target "$GITHUB_SHA" --title "$TAG" --generate-notes
+          fi
+          for intento in 1 2 3; do
+            if gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber \
+              anivault-windows.zip; then
+              break
+            fi
+            if [ "$intento" = 3 ]; then
+              echo "::error::No se pudieron subir los assets tras 3 intentos."
+              exit 1
+            fi
+            echo "Subida fallida (intento $intento); reintentando en 15 s..."
+            sleep 15
+          done
+          # No se publica aca: lo hace el workflow de Android al subir la APK, para que el
+          # portafolio nunca vea un release "listo" sin APK.
